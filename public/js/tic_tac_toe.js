@@ -1,5 +1,3 @@
-//Created: 03-2021
-//Last updated: 04-22-2021
 var socket = io.connect('https://tic-tac-toe-2021.herokuapp.com/');
 var variables = {
     'roomId': null,
