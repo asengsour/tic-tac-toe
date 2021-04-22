@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tic-tac-toe</title>
+    <link rel="stylesheet" type="text/css" id="applicationStylesheet" href="css/tic_tac_toe.css" />
+    <script src="http://127.0.0.1:3000/socket.io/socket.io.js"></script>
+    <script src="http://192.168.0.119:3000/socket.io/socket.io.js"></script>
+    <script language="JavaScript" type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script language="JavaScript" type="text/javascript" src="js/tic_tac_toe.js"></script>
+</head>
+
+<body>
+
+    <div class="main-bg">
+        <div id="tic-tac-toe-board">
+            <div class="box0 box">
+            </div>
+            <div class="box1 box">
+            </div>
+            <div class="box2 box">
+            </div>
+            <div class="box3 box">
+            </div>
+            <div class="box4 box">
+            </div>
+            <div class="box5 box">
+            </div>
+            <div class="box6 box">
+            </div>
+            <div class="box7 box">
+            </div>
+            <div class="box8 box">
+            </div>
+        </div>
+
+        <div class="start-menu container">
+            <span id="start-menu-random-match" class="start-menu button random-match">Random Match</span>
+            <span id="start-menu-join-player" class="start-menu button join">Join Player</span>
+            <span id="start-menu-host" class="start-menu button host">Host</span>
+        </div>
+
+        <div class="side-menu container">
+            <span id="side-random-match" class="side-menu button random-match">Random Match</span>
+            <span id="side-join-player" class="side-menu button join">Join Player</span>
+            <span id="side-host" class="side-menu button host">Host</span>
+            <span id="side-leave" class="side-menu button leave">Leave</span>
+        </div>
+
+        <button class="side-menu-show-button">
+                <svg class="side-menu-show-button" viewBox="0 0 45 35">
+                    <path d="M 2.5 0 C 1.119288086891174 0 -2.384185791015625e-07 1.119288444519043 0 2.500000476837158 C 0 3.880711555480957 1.119287967681885 5 2.499999523162842 5 L 42.5 5 C 43.88071060180664 5 45 3.880711793899536 45 2.5 C 45 1.119288086891174 43.88071060180664 0 42.5 0 L 2.5 0 Z M 2.5 15 C 1.119288086891174 15 -2.384185791015625e-07 16.11928939819336 0 17.5 C 0 18.88071250915527 1.119287967681885 20 2.499999523162842 20 L 42.5 20 C 43.88071060180664 20 45 18.88071250915527 45 17.5 C 45 16.11928749084473 43.88071060180664 15 42.5 15 L 2.5 15 Z M 2.5 30 C 1.119288086891174 30 -2.384185791015625e-07 31.11928939819336 0 32.5 C 0 33.88071060180664 1.119287967681885 35 2.499999523162842 35 L 42.5 35 C 43.88071060180664 35 45 33.88071060180664 45 32.5 C 45 31.11928749084473 43.88071060180664 30 42.5 30 L 2.5 30 Z"></path>
+                </svg>
+            </button>
+
+        <div class="join-room container">
+            <span id="title-join-room" class="join-room">Join Room</span>
+            <input type="text" id="input-room-id" class="join-room" autocomplete="off" placeholder="enter room id"></input>
+        </div>
+
+        <div class="restriction container">
+            <span id="private" class="restriction choice">Private</span>
+            <span id="public" class="restriction choice">Public</span>
+        </div>
+
+        <span class="room-id">room id: jSc5e</span>
+        <span class="result">WON</span>
+        <span class="new-game choice" onclick="newGame()">NEW GAME</span>
+        <span class="title-waiting">Waiting for player<br/>. . . </span><br>
+
+
+    </div>
+</body>
+
+</html>
