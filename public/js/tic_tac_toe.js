@@ -190,7 +190,6 @@ function end(result, players) {
     var result_e = document.getElementsByClassName('result')[0];
     var isPlayer = socket.id === variables.gameData.players[0] || socket.id === variables.gameData.players[1];
 
-    console.log(variables.gameData);
     // Refresh website
     if (result === undefined && players === undefined) {
         window.location = window.parent.location.origin
@@ -325,7 +324,6 @@ socket.on('opponent-connect', (opponentId) => {
 });
 
 socket.on('disconnected', (userId) => {
-    console.log('user disconnected');
     wasDisconnectUserPlayer = (userId === variables.gameData.players[0] || userId === variables.gameData.players[1])
     result = (variables.gameData.players[0] === userId) ? 'o' : 'x';
 
@@ -345,7 +343,6 @@ socket.on('room-available', (availableRoom) => {
 });
 
 socket.on('gameplay', ([data, gameRoomId]) => {
-    console.log(variables.gameData)
     result =
         updateVariables([
             ['gameData', data],
@@ -364,7 +361,6 @@ socket.on('gameplay', ([data, gameRoomId]) => {
         animate_board('center');
         updateVariables(['joined', false]);
     }
-    console.log(result);
     if (result !== 'null') {
         end(result, variables.gameData.players)
         variables.gameData.in_session = false;
@@ -402,7 +398,6 @@ socket.on('gameplay', ([data, gameRoomId]) => {
 });
 
 socket.on('join-room', () => {
-    console.log('joined')
     updateVariables(['joined', true])
         // If client is player x then emit data to spectator
     if (variables.gameData.players[0] === socket.id) {
