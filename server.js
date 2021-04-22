@@ -11,6 +11,19 @@ const server = http.createServer(app);
 const io = socketio(server);
 const port = process.env.PORT || 80;
 
+// MongoDB Atlas
+// var MongoClient = require('mongodb').MongoClient;
+// MongoClient.connect(process.env.uri, function(err, db) {
+
+//     var cursor = db.collection('player').find();
+
+//     cursor.each(function(err, doc) {
+
+//         console.log(doc);
+
+//     });
+// });
+
 // Static Files
 app.use(express.static('public'))
 app.use('/css', express.static(__dirname + 'public/css'))
