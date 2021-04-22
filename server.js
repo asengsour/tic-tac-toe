@@ -9,7 +9,7 @@ const socketio = require('socket.io');
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 80;
 
 // MongoDB Atlas
 // var MongoClient = require('mongodb').MongoClient;
@@ -106,5 +106,5 @@ io.on('connection', (socket) => {
     });
 });
 
-// Listen on port 3000
+// Listen on port 80
 server.listen(port, () => console.info(`Listening on port ${port}`))

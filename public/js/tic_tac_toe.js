@@ -1,6 +1,6 @@
 //Created: 04-2021
 //Last updated: 04-22-2021
-var socket = io.connect('http://192.168.0.119:3000');
+var socket = io.connect('https://tic-tac-toe-2021.herokuapp.com:80');
 var variables = {
     'roomId': null,
     'joined': null,
