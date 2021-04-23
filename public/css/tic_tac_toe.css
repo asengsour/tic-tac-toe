@@ -85,8 +85,8 @@
         font-size: 32px;
     }
     #tic-tac-toe-board {
-        width: 97.32vw;
-        height: 97.32vw;
+        width: 80vw;
+        height: 80vw;
         min-width: 325px;
         min-height: 325px;
         max-width: 400px;
