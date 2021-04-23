@@ -120,8 +120,8 @@
         width: 6em;
         height: 1.2em;
         left: 50%;
-        top: 10%;
-        transform: translate(-50%, -10%);
+        top: 6.25%;
+        transform: translate(-50%, -6.25%);
         font-size: 96px;
     }
     .restriction.container {

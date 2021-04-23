@@ -114,20 +114,25 @@ function animate_board() {
     var side_menu_e = document.getElementsByClassName("side-menu")[0];
     var new_game_e = document.getElementsByClassName("new-game")[0];
 
-    var inPlay = join_room_e.style.visibility === 'hidden' && title_wait_e.style.visibility === 'hidden' && side_menu_e.style.visibility === 'hidden'
+    var inPlay = join_room_e.style.visibility === 'hidden' && title_wait_e.style.visibility === 'hidden'
+    var sideMenuVisible = side_menu_e.style.visibility !== 'hidden'
 
-    if (inPlay) {
-        new_game_e.style.top = '50%';
-        new_game_e.style.transform = "translate(-50%, -50%)"
-        board_e.style.top = '50%';
-        board_e.style.transform = "translate(-50%, -50%)"
-    } else {
-        new_game_e.style.top = '80%';
-        new_game_e.style.transform = "translate(-50%, -80%)"
-        board_e.style.top = '80%';
-        board_e.style.transform = "translate(-50%, -80%)"
+    const mediaQuery = window.matchMedia('(max-width: 700px)');
+
+    function moveBoardYAxis(yAxisPercentage) {
+        new_game_e.style.top = `${yAxisPercentage}%`;
+        new_game_e.style.transform = `translate(-50%, -${yAxisPercentage}%)`
+        board_e.style.top = `${yAxisPercentage}%`;
+        board_e.style.transform = `translate(-50%, -${yAxisPercentage}%)`
     }
 
+    if (inPlay) {
+        if (sideMenuVisible && mediaQuery.matches) {
+            moveBoardYAxis(80)
+        } else {
+            moveBoardYAxis(50)
+        }
+    }
 }
 
 function joinRoom(roomId) {
