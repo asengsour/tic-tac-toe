@@ -43,9 +43,6 @@
         width: calc((400px/3) - 7.1px*2);
         max-width: calc((400px/3) - 7.1px*2);
         height: 2em;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
         border-radius: 30px;
         font-size: 16px;
     }
@@ -139,9 +136,6 @@
         min-width: calc((400px/3) - 8px*2);
         max-width: calc((450px/3) - 8px*2);
         height: 2em;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
         border-radius: 30px;
         font-size: 20px;
     }
@@ -368,6 +362,9 @@
 */
 
 .new-game.choice {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
     position: absolute;
     font-family: Helvetica Neue;
     font-weight: 350;

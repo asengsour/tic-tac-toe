@@ -120,8 +120,6 @@ function animate_board() {
     const mediaQuery = window.matchMedia('(max-width: 700px)');
 
     function moveBoardYAxis(yAxisPercentage) {
-        new_game_e.style.top = `${yAxisPercentage}%`;
-        new_game_e.style.transform = `translate(-50%, -${yAxisPercentage}%)`
         board_e.style.top = `${yAxisPercentage}%`;
         board_e.style.transform = `translate(-50%, -${yAxisPercentage}%)`
     }
