@@ -1,5 +1,5 @@
 var socket = io.connect('https://tic-tac-toe-2021.herokuapp.com/');
-// var socket = io.connect('http://127.0.0.1:80');
+var socket = io.connect('http://127.0.0.1:80');
 
 var variables = {
     'roomId': null,
@@ -47,63 +47,53 @@ function makeid(length) {
     return result;
 }
 
-function visibility(visible, toggle) {
+function visibility(visible, action_type) {
     elements = ['room-id', 'result', 'new-game',
         'join-room', 'title-waiting', 'start-menu',
         'side-menu', 'side-menu-show-button', 'restriction',
     ];
+    _elements = [
+        'result', 'join-room', 'title-waiting', 'restriction'
+    ];
+    const mediaQuery = window.matchMedia('(max-width: 700px)');
     //Make elements visible or toggle
-    if (toggle === true) {
+    if (action_type == 'toggle') {
         for (var e of visible) {
-            const mediaQuery = window.matchMedia('(max-width: 700px)');
-            elements = [
-                'result', 'join-room', 'title-waiting'
-            ];
-
             if (mediaQuery.matches) {
-                // Allow only visible elements to be toggled
-                for (var _e of elements) {
-                    var element = document.getElementsByClassName(_e)[0]
-                    if (element.style.visibility === 'visible' && !visible_elements.includes(_e)) {
-                        visible_elements.push(_e)
-                    }
-                }
-                for (var _e of visible_elements) {
-                    var toggle_e = document.getElementsByClassName(_e)
-                    for (var i = 0; i < toggle_e.length; i++) {
-                        toggle_e[i].style.visibility = (toggle_e[i].style.visibility === 'visible') ? 'hidden' : 'visible';
+                for (var _e of _elements) {
+                    if ($(`.${_e}`).css('display') != 'none') {
+                        $(`.${_e}`).css('visibility', $(`.${_e}`).css('visibility') == 'hidden' ? 'visible' : 'hidden');
                     }
                 }
             }
-
-            // Make element(s) in visible array toggled
-            var toggle_e = document.getElementsByClassName(e);
-            for (var i = 0; i < toggle_e.length; i++) {
-                toggle_e[i].style.display = '';
-                toggle_e[i].style.visibility = (toggle_e[i].style.visibility === 'visible') ? 'hidden' : 'visible';
+            $(`.${e}`).toggle()
+            $(`.${e}`).css('visibility', $(`.${e}`).css('visibility') == 'hidden' ? 'visible' : 'hidden');
+        }
+    } else if (action_type == 'decreased') {
+        for (var e of visible) {
+            for (var _e of _elements) {
+                if ($(`.${_e}`).css('visibility') === 'visible' && $(`.${e}`).css('visibility') === 'visible') {
+                    $(`.${_e}`).css('visibility', 'hidden');
+                }
             }
-
+        }
+    } else if (action_type == 'increased') {
+        for (var e of visible) {
+            for (var _e of _elements) {
+                if ($(`.${_e}`).css('display') != 'none') {
+                    $(`.${_e}`).css('visibility', 'visible');
+                }
+            }
         }
     } else {
-        visible_elements = [];
         for (var e of visible) {
-
             // Makes visible_elements visible
-            var toggle_e = document.getElementsByClassName(e);
-            for (var i = 0; i < toggle_e.length; i++) {
-                toggle_e[i].style.display = '';
-                toggle_e[i].style.visibility = 'visible';
-            }
-
+            $(`.${e}`).css('display', '');
+            $(`.${e}`).css('visibility', 'visible');
             // Only hides elements that aren't meant to be visible
-            for (var e of removeItemAll(elements, e)) {
-                var toggle_e = document.getElementsByClassName(e);
-                for (var i = 0; i < toggle_e.length; i++) {
-                    toggle_e[i].style.display = 'none';
-                    toggle_e[i].style.visibility = 'hidden';
-
-                }
-
+            for (var _e of removeItemAll(elements, e)) {
+                $(`.${_e}`).css('display', 'none');
+                $(`.${_e}`).css('visibility', 'hidden');
             }
         }
     }
@@ -266,10 +256,10 @@ function resultCheck(board, spaces_left) {
 }
 
 window.addEventListener('resize', () => {
-    if (window.innerWidth < 701) {
-        if (document.getElementsByClassName('side-menu')[0].style.visibility === 'visible') {
-            visibility(['side-menu'], true)
-        }
+    if (window.innerWidth <= 700) {
+        visibility(['side-menu'], 'decreased')
+    } else if (window.innerWidth >= 701) {
+        visibility(['side-menu'], 'increased')
     }
 });
 
@@ -299,7 +289,7 @@ window.addEventListener('click', (event) => {
         end();
     }
     if (event.target.matches('.side-menu-show-button')) {
-        visibility(['side-menu'], true)
+        visibility(['side-menu'], 'toggle')
     }
     var playerTurn = Object.values(variables.gameData.player_turn)[0] === socket.id;
     for (var i = 0; i < 9; i++) {
