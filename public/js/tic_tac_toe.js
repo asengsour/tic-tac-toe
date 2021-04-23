@@ -109,15 +109,21 @@ function visibility(visible, toggle) {
 
 function animate_board() {
     var board_e = document.getElementById("tic-tac-toe-board");
-    var join_room_e = document.getElementsByClassName("join-room");
-    var title_wait_e = document.getElementsByClassName("title-waiting");
-    var side_menu = document.getElementsByClassName("side-menu");
-    var inPlay = join_room_e[0].style.visibility === 'hidden' && title_wait_e[0].style.visibility === 'hidden' && side_menu[0].style.visibility === 'hidden'
+    var join_room_e = document.getElementsByClassName("join-room")[0];
+    var title_wait_e = document.getElementsByClassName("title-waiting")[0];
+    var side_menu_e = document.getElementsByClassName("side-menu")[0];
+    var new_game_e = document.getElementsByClassName("new-game")[0];
+
+    var inPlay = join_room_e.style.visibility === 'hidden' && title_wait_e.style.visibility === 'hidden' && side_menu_e.style.visibility === 'hidden'
 
     if (inPlay) {
+        new_game_e.style.top = '50%';
+        new_game_e.style.transform = "translate(-50%, -50%)"
         board_e.style.top = '50%';
         board_e.style.transform = "translate(-50%, -50%)"
     } else {
+        new_game_e.style.top = '80%';
+        new_game_e.style.transform = "translate(-50%, -80%)"
         board_e.style.top = '80%';
         board_e.style.transform = "translate(-50%, -80%)"
     }
