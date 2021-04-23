@@ -105,18 +105,12 @@ function visibility(visible, action_type) {
 }
 
 function animate_board() {
-    var board_e = document.getElementById("tic-tac-toe-board");
-    var join_room_e = document.getElementsByClassName("join-room")[0];
-    var title_wait_e = document.getElementsByClassName("title-waiting")[0];
-    var restriction_e = document.getElementsByClassName("restriction")[0];
-    var side_menu_e = document.getElementsByClassName("side-menu")[0];
-
-    var inPlay = join_room_e.style.visibility === 'hidden' && title_wait_e.style.visibility === 'hidden' && restriction_e.style.visibility === 'hidden'
-    var sideMenuVisible = side_menu_e.style.visibility !== 'hidden'
+    var inPlay = $('.join-room').css('visibility') == 'hidden' && $('.title-waiting').css('visibility') == 'hidden' && $('.restriction').css('visibility') == 'hidden'
+    var sideMenuVisible = $('.side-menu').css('visibility') !== 'hidden'
 
     function moveBoardYAxis(yAxisPercentage) {
-        board_e.style.top = `${yAxisPercentage}%`;
-        board_e.style.transform = `translate(-50%, -${yAxisPercentage}%)`
+        $('#tic-tac-toe-board').css('top', `${yAxisPercentage}%`);
+        $('#tic-tac-toe-board').css('transform', `translate(-50%, -${yAxisPercentage}%)`);
     }
 
     if (inPlay) {
@@ -133,15 +127,13 @@ function animate_board() {
 function joinRoom(roomId) {
     socket.emit('join-room', roomId);
     socket.emit('opponent-connect', [socket.id, roomId])
-    var room_id_e = document.getElementsByClassName('room-id')[0];
-    room_id_e.innerHTML = `room id: ${roomId}`;
+    $('.room-id').html(`room id: ${roomId}`);
 }
 
 function host(restriction) {
     visibility(['room-id', 'title-waiting', 'side-menu-show-button']);
-    var room_id_e = document.getElementsByClassName('room-id')[0];
     const new_room_id = makeid(5);
-    room_id_e.innerHTML = `room id: ${new_room_id}`;
+    $('.room-id').html(`room id: ${new_room_id}`);
     updateVariables([
         ['gameData', {
             "players": [],
@@ -193,7 +185,6 @@ function newGame() {
 }
 
 function end(result, players) {
-    var result_e = document.getElementsByClassName('result')[0];
     var isPlayer = socket.id === variables.gameData.players[0] || socket.id === variables.gameData.players[1];
 
     // Refresh website
@@ -204,14 +195,15 @@ function end(result, players) {
     // Check if client is a player
     else if (isPlayer) {
         clientIsPlayerX = players[0] === socket.id
-        result_e.innerHTML =
+        $('.result').html(
             ((result === 'x' && clientIsPlayerX) || (result === 'o' && !clientIsPlayerX) || result === null) ? 'WON' :
             (result === 'cat') ? 'CAT' : 'LOST'
+        );
         visibility(['new-game', 'result', 'room-id', 'side-menu-show-button']);
     } else if (!isPlayer) {
         visibility(['result', 'room-id', 'side-menu-show-button']);
         if (result !== null) {
-            result_e.innerHTML = `${result.toUpperCase()} WON`
+            $('.result').html(`${result.toUpperCase()} WON`);
         }
     }
 }
@@ -391,31 +383,28 @@ socket.on('gameplay', ([data, gameRoomId]) => {
     //Set background image for each box; 1 = x, -1 = o
     Object.entries(variables.gameData.board).forEach(entry => {
         var [box_position, box_value] = entry;
-        box_e = document.getElementsByClassName(`box${box_position}`)[0];
+
         var selected = box_e.style.opacity === 1;
-        box_e.style.display = 'inherit';
-        //Reset board
-        if (newGame) {
-            box_e.style.visibility = 'initial';
-            box_e.style.opacity = 0;
-        }
+        $(`.box${box_position}`).css('display', 'inherit');
+        // Set boxes state based on box value
+        $(`.box${box_position}`).css('opacity',
+            (box_value != 0) ? 1 : 0
+        );
+        // Set visibility
+        $(`.box${box_position}`).css('visibility',
+            (!selected && (!playerTurn || result !== 'null')) ? 'hidden' :
+            (newGame) ? 'initial' :
+            'visible'
+        );
         // For screens big enough, Make boxes unselected visibly hoverable based on turn or session state
         if (!selected && playerTurn) {
-            box_e.style.visibility = 'visible';
-            box_e.style.backgroundImage = `url('../img/${Object.keys(variables.gameData.player_turn)[0]}.svg')`
-        } else if (!selected && (!playerTurn || result !== 'null')) {
-            box_e.style.visibility = 'hidden';
+            $(`.box${box_position}`).css('background-image', `url('../img/${Object.keys(variables.gameData.player_turn)[0]}.svg')`);
         }
-        // Set boxes state based on board value
-        if (box_value === 1) {
-            box_e.style.visibility = 'visible';
-            box_e.style.opacity = 1;
-            box_e.style.backgroundImage = `url('../img/x.svg')`;
-        } else if (box_value === -1) {
-            box_e.style.visibility = 'visible';
-            box_e.style.opacity = 1;
-            box_e.style.backgroundImage = `url('../img/o.svg')`;
-        }
+        //Set background-imagge
+        $(`.box${box_position}`).css('background-image',
+            (box_value == 1) ? `url('../img/x.svg')` :
+            (box_value == -1) ? `url('../img/o.svg')` : null
+        );
     });
 });
 
