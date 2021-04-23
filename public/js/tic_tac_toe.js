@@ -265,7 +265,15 @@ function resultCheck(board, spaces_left) {
     return result
 }
 
-window.addEventListener('keyup', function(event) {
+window.addEventListener('resize', () => {
+    if (window.innerWidth < 701) {
+        if (document.getElementsByClassName('side-menu')[0].style.visibility === 'visible') {
+            visibility(['side-menu'], true)
+        }
+    }
+});
+
+window.addEventListener('keyup', (event) => {
     if (event.key == 13 || event.key == 'Enter') {
         if (event.target.matches('#input-room-id')) {
             joinRoom(event.target.value);
