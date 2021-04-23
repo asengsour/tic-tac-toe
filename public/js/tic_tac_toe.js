@@ -119,10 +119,10 @@ function animate_board(position) {
 
     if (position === 'center' && join_room_e[0].style.visibility === 'hidden' && title_wait_e[0].style.visibility === 'hidden') {
         board_e.style.top = '50%';
-        board_e.style.transform = "translate(-50%,-50%)"
+        board_e.style.transform = "translate(-50%, -50%)"
     } else {
         board_e.style.top = '80%';
-        board_e.style.transform = "translate-y(-50%,-80%)"
+        board_e.style.transform = "translate(-50%, -80%)"
     }
 
 }

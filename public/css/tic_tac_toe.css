@@ -124,6 +124,17 @@
         transform: translate(-50%, -10%);
         font-size: 96px;
     }
+    .restriction.container {
+        left: calc(50% + 1.2em/2);
+        top: 12.5%;
+        transform: translate(-50%, -12.5%);
+    }
+    .restriction.choice {
+        width: 6em;
+        height: 2em;
+        border-radius: 30px;
+        font-size: 20px;
+    }
     .new-game.choice {
         min-width: calc((400px/3) - 8px*2);
         max-width: calc((450px/3) - 8px*2);
@@ -180,17 +191,6 @@
         left: 50%;
         top: 80%;
         transform: translate(-50%, -80%);
-    }
-    .restriction.container {
-        left: calc(50% + 1.2em/2);
-        top: 12.5%;
-        transform: translate(-50%, -12.5%);
-    }
-    .restriction.choice {
-        width: 6em;
-        height: 2em;
-        border-radius: 30px;
-        font-size: 20px;
     }
     .room-id {
         font-size: 24px;
