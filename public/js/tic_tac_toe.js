@@ -318,11 +318,10 @@ socket.on('room-available', (availableRoom) => {
 });
 
 socket.on('gameplay', ([data, gameRoomId]) => {
-    result =
-        updateVariables([
-            ['gameData', data],
-            ['roomId', gameRoomId]
-        ]);
+    updateVariables([
+        ['gameData', data],
+        ['roomId', gameRoomId]
+    ]);
     gameResult = resultCheck(variables.gameData.board, variables.gameData.spaces_left);
     var playerTurn = Object.values(variables.gameData.player_turn)[0] === socket.id;
     var result = Object.keys((gameResult === 'x') ? { 'x': variables.gameData.players[0] } :
