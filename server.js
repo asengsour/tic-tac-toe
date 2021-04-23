@@ -93,6 +93,7 @@ io.on('connection', (socket) => {
     socket.on('join-room', (roomId) => {
         // Check to see if room exists
         if (roomId in rooms) {
+            // Check if room is game room
             if (roomId.length == 5) {
                 socket.join(roomId);
                 currentRoomId = roomId;
