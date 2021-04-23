@@ -93,10 +93,12 @@ io.on('connection', (socket) => {
     socket.on('join-room', (roomId) => {
         // Check to see if room exists
         if (roomId in rooms) {
-            socket.join(roomId);
-            currentRoomId = roomId;
-            io.sockets.to(roomId).emit('join-room');
-            console.log(`player: ${socket.id} has joined gameroom: ${roomId}`);
+            if (roomId.length == 5) {
+                socket.join(roomId);
+                currentRoomId = roomId;
+                io.sockets.to(roomId).emit('join-room');
+                console.log(`player: ${socket.id} has joined gameroom: ${roomId}`);
+            }
         } else {
             console.log(`${roomId} does not exist`);
         }
