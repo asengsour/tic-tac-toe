@@ -182,21 +182,10 @@ function end(result, players) {
     }
     // Check if client is a player
     else if (isPlayer) {
-        if (result === 'x') {
-            if (players[0] === socket.id) { // If client is player x
-                result_e.innerHTML = 'WON'
-            } else {
-                result_e.innerHTML = 'LOST'
-            }
-        } else if (result === 'o') {
-            if (players[1] === socket.id) { // If client is player o
-                result_e.innerHTML = 'WON'
-            } else {
-                result_e.innerHTML = 'LOST'
-            }
-        } else {
-            result_e.innerHTML = 'CAT'
-        }
+        clientIsPlayerX = players[0] === socket.id
+        result_e.innerHTML =
+            ((result === 'x' && clientIsPlayerX) || (result === 'o' && !clientIsPlayerX)) ? 'WON' :
+            (result === 'cat') ? 'CAT' : 'LOST'
         visibility(['new-game', 'result', 'room-id', 'side-menu-show-button']);
     } else if (!isPlayer) {
         visibility(['result', 'room-id', 'side-menu-show-button']);
