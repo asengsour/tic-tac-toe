@@ -326,25 +326,23 @@ socket.on('disconnected', (userId) => {
     playerRemaining = variables.gameData.players.filter(item => item !== userId)[0]
     whosTurn = Object.keys(variables.gameData.player_turn)[0];
 
-    updateVariables([
-        'gameData', {
-            "players": [playerRemaining],
-            "player_turn": variables.gameData.player_turn,
-            "result": variables.gameData.result,
-            "board": variables.gameData.board,
-            "spaces_left": variables.gameData.spaces_left,
-            "in_session": false,
-            "restriction": variables.gameData.restriction,
-        }
-    ]);
+    if (wasDisconnectUserPlayer) {
+        updateVariables([
+            'gameData', {
+                "players": [playerRemaining],
+                "player_turn": variables.gameData.player_turn,
+                "result": variables.gameData.result,
+                "board": variables.gameData.board,
+                "spaces_left": variables.gameData.spaces_left,
+                "in_session": false,
+                "restriction": variables.gameData.restriction,
+            }
+        ]);
 
-    if (variables.gameData.spaces_left < 9) {
-        (wasDisconnectUserPlayer) ?
-        (
-            end(null, variables.gameData.players),
-            socket.emit('gameplay', [variables.gameData, variables.roomId])
-        ) :
-        null;
+        if (variables.gameData.spaces_left < 9) {
+            end(null, variables.gameData.players)
+        }
+        socket.emit('gameplay', [variables.gameData, variables.roomId]);
     }
 });
 
@@ -369,11 +367,10 @@ socket.on('gameplay', ([data, gameRoomId]) => {
         (gameResult === 'cat') ? { 'cat': null } : { 'null': null })[0];
     var newGame = variables.gameData.spaces_left === 9;
     var inSession = variables.gameData.in_session;
-
     if (inSession && (variables.joined || newGame)) {
         visibility(['side-menu-show-button', 'room-id']);
         updateVariables(['joined', false]);
-    } else if (!inSession && variables.gameData.spaces_left === 9) {
+    } else if (!inSession && variables.gameData.spaces_left == 9) {
         visibility(['side-menu-show-button', 'room-id', 'title-waiting']);
     }
     if (result !== 'null') {
@@ -383,21 +380,24 @@ socket.on('gameplay', ([data, gameRoomId]) => {
     //Set background image for each box; 1 = x, -1 = o
     Object.entries(variables.gameData.board).forEach(entry => {
         var [box_position, box_value] = entry;
-
-        var selected = box_e.style.opacity === 1;
+        var selected = $(`.box${box_position}`).css('opacity') == 1;
         $(`.box${box_position}`).css('display', 'inherit');
         // Set boxes state based on box value
         $(`.box${box_position}`).css('opacity',
-            (box_value != 0) ? 1 : 0
+            (box_value != 0) ? 1 : ''
         );
         // Set visibility
+        if ((!selected && (!playerTurn || result !== 'null') || newGame)) {
+            $(`.box${box_position}`).css('visibility',
+                'hidden'
+            );
+        }
         $(`.box${box_position}`).css('visibility',
-            (!selected && (!playerTurn || result !== 'null')) ? 'hidden' :
-            (newGame) ? 'initial' :
-            'visible'
+            ((!selected && playerTurn) || (box_value != 0)) ? 'visible' : null
         );
         // For screens big enough, Make boxes unselected visibly hoverable based on turn or session state
         if (!selected && playerTurn) {
+            $(`.box${box_position}`).css('visibility', 'visible');
             $(`.box${box_position}`).css('background-image', `url('../img/${Object.keys(variables.gameData.player_turn)[0]}.svg')`);
         }
         //Set background-imagge
