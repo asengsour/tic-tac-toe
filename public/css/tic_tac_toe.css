@@ -120,8 +120,8 @@
         width: 6em;
         height: 1.2em;
         left: 50%;
-        top: 12.5%;
-        transform: translate(-50%, -12.5%);
+        top: 10%;
+        transform: translate(-50%, -10%);
         font-size: 96px;
     }
     .new-game.choice {

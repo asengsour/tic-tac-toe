@@ -118,8 +118,8 @@ function animate_board(position) {
     var title_wait_e = document.getElementsByClassName("title-waiting");
 
     if (position === 'center' && join_room_e[0].style.visibility === 'hidden' && title_wait_e[0].style.visibility === 'hidden') {
-        board_e.style.top = '65%';
-        board_e.style.transform = "translate-y(-65%)"
+        board_e.style.top = '50%';
+        board_e.style.transform = "translate-y(-50%)"
     } else {
         board_e.style.top = '80%';
         board_e.style.transform = "translate-y(-80%)"
