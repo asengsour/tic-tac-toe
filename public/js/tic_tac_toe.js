@@ -45,14 +45,6 @@ function makeid(length) {
     return result;
 }
 
-function create_query(params) {
-    var esc = encodeURIComponent;
-    var query = Object.keys(params)
-        .map(k => esc(k) + '=' + esc(params[k]))
-        .join('&');
-    return query
-}
-
 function visibility(visible, toggle) {
     elements = ['room-id', 'result', 'new-game',
         'join-room', 'title-waiting', 'start-menu',
@@ -140,16 +132,12 @@ function joinRoom(roomId) {
     socket.emit('opponent-connect', [socket.id, roomId])
     var room_id_e = document.getElementsByClassName('room-id')[0];
     room_id_e.innerHTML = `room id: ${roomId}`;
-    history.pushState('test', 'tic-tac-toe', '?' + create_query({ 'room_id': roomId }));
 }
 
 function host(restriction) {
     visibility(['room-id', 'title-waiting', 'side-menu-show-button']);
     var room_id_e = document.getElementsByClassName('room-id')[0];
     const new_room_id = makeid(5);
-    history.pushState('test',
-        'tic-tac-toe', '?' + create_query({ 'room_id': new_room_id })
-    );
     room_id_e.innerHTML = `room id: ${new_room_id}`;
     updateVariables([
         ['gameData', {
