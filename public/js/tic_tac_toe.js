@@ -14,7 +14,7 @@ var variables = {
         "restriction": null,
     }
 }
-var visible_elements = [];
+const mediaQuery = window.matchMedia('(max-width: 700px)');
 
 function removeItemAll(arr, value) {
     var i = 0;
@@ -47,6 +47,7 @@ function makeid(length) {
     return result;
 }
 
+
 function visibility(visible, action_type) {
     elements = ['room-id', 'result', 'new-game',
         'join-room', 'title-waiting', 'start-menu',
@@ -55,8 +56,7 @@ function visibility(visible, action_type) {
     _elements = [
         'result', 'join-room', 'title-waiting', 'restriction'
     ];
-    const mediaQuery = window.matchMedia('(max-width: 700px)');
-    //Make elements visible or toggle
+    // Make elements visible or toggle
     if (action_type == 'toggle') {
         for (var e of visible) {
             if (mediaQuery.matches) {
@@ -69,7 +69,9 @@ function visibility(visible, action_type) {
             $(`.${e}`).toggle()
             $(`.${e}`).css('visibility', $(`.${e}`).css('visibility') == 'hidden' ? 'visible' : 'hidden');
         }
-    } else if (action_type == 'decreased') {
+    }
+    // Update elements to hide if window size decreased side-menu is visible
+    else if (action_type == 'decreased') {
         for (var e of visible) {
             for (var _e of _elements) {
                 if ($(`.${_e}`).css('visibility') === 'visible' && $(`.${e}`).css('visibility') === 'visible') {
@@ -77,7 +79,9 @@ function visibility(visible, action_type) {
                 }
             }
         }
-    } else if (action_type == 'increased') {
+    }
+    // Update elements to show if window size increased and side-menu is visible
+    else if (action_type == 'increased') {
         for (var e of visible) {
             for (var _e of _elements) {
                 if ($(`.${_e}`).css('display') != 'none') {
@@ -109,8 +113,6 @@ function animate_board() {
 
     var inPlay = join_room_e.style.visibility === 'hidden' && title_wait_e.style.visibility === 'hidden' && restriction_e.style.visibility === 'hidden'
     var sideMenuVisible = side_menu_e.style.visibility !== 'hidden'
-
-    const mediaQuery = window.matchMedia('(max-width: 700px)');
 
     function moveBoardYAxis(yAxisPercentage) {
         board_e.style.top = `${yAxisPercentage}%`;
