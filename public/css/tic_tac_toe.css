@@ -93,7 +93,7 @@
     }
 }
 
-@media (min-width:701px) and (min-height:701px) {
+@media (min-width:701px) {
     .main-bg {
         margin: 25px;
         width: calc(100vw - 50px);
