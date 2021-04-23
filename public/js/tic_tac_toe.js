@@ -107,16 +107,17 @@ function visibility(visible, toggle) {
             }
         }
     }
+    animate_board()
 }
 
 function animate_board() {
     var board_e = document.getElementById("tic-tac-toe-board");
     var join_room_e = document.getElementsByClassName("join-room")[0];
     var title_wait_e = document.getElementsByClassName("title-waiting")[0];
+    var restriction_e = document.getElementsByClassName("restriction")[0];
     var side_menu_e = document.getElementsByClassName("side-menu")[0];
-    var new_game_e = document.getElementsByClassName("new-game")[0];
 
-    var inPlay = join_room_e.style.visibility === 'hidden' && title_wait_e.style.visibility === 'hidden'
+    var inPlay = join_room_e.style.visibility === 'hidden' && title_wait_e.style.visibility === 'hidden' && restriction_e.style.visibility === 'hidden'
     var sideMenuVisible = side_menu_e.style.visibility !== 'hidden'
 
     const mediaQuery = window.matchMedia('(max-width: 700px)');
@@ -284,13 +285,13 @@ window.addEventListener('click', (event) => {
     }
     if (event.target.matches('.random-match')) {
         socket.emit('search-rooms', [false, socket.id]);
+
     }
     if (event.target.matches('.leave')) {
         end();
     }
     if (event.target.matches('.side-menu-show-button')) {
         visibility(['side-menu'], true)
-        animate_board()
     }
     var playerTurn = Object.values(variables.gameData.player_turn)[0] === socket.id;
     for (var i = 0; i < 9; i++) {
@@ -379,11 +380,9 @@ socket.on('gameplay', ([data, gameRoomId]) => {
 
     if (inSession && (variables.joined || newGame)) {
         visibility(['side-menu-show-button', 'room-id']);
-        animate_board();
         updateVariables(['joined', false]);
     } else if (!inSession && variables.gameData.spaces_left === 9) {
         visibility(['side-menu-show-button', 'room-id', 'title-waiting']);
-        animate_board();
     }
     if (result !== 'null') {
         end(result, variables.gameData.players)
