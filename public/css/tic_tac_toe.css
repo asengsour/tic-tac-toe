@@ -85,8 +85,8 @@
         font-size: 32px;
     }
     #tic-tac-toe-board {
-        width: 400px;
-        height: 400px;
+        width: 350px;
+        height: 350px;
         left: 50%;
         top: 80%;
         transform: translate(-50%, -80%);
