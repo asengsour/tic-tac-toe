@@ -40,8 +40,8 @@
         font-size: 16px;
     }
     .new-game.choice {
-        width: calc((400px/3) - 7.1px*2);
-        max-width: calc((400px/3) - 7.1px*2);
+        width: calc((80vw/3) - 2vw*2);
+        max-width: calc((80vw/3) - 2vw*2);
         height: 2em;
         border-radius: 30px;
         font-size: 16px;
@@ -123,8 +123,8 @@
     }
     .restriction.container {
         left: calc(50% + 1.2em/2);
-        top: 12.5%;
-        transform: translate(-50%, -12.5%);
+        top: 6.25%;
+        transform: translate(-50%, -6.25%);
     }
     .restriction.choice {
         width: 6em;
@@ -142,9 +142,9 @@
     .join-room.container {
         max-width: 256px;
         max-height: 256px;
-        top: 12.5%;
+        top: 6.25%;
         left: 50%;
-        transform: translate(-50%, -12.5%);
+        transform: translate(-50%, -6.25%);
     }
     #input-room-id {
         font-size: 16px;
@@ -159,8 +159,8 @@
     .title-waiting {
         max-width: 256px;
         left: 50%;
-        transform: translate(-50%, -12.5%);
-        top: 12.5%;
+        transform: translate(-50%, -6.25%);
+        top: 6.25%;
         font-size: 32px;
     }
     .start-menu.container {

@@ -1,4 +1,6 @@
 var socket = io.connect('https://tic-tac-toe-2021.herokuapp.com/');
+var socket = io.connect('http://127.0.0.1:80');
+
 var variables = {
     'roomId': null,
     'joined': null,
@@ -130,6 +132,8 @@ function animate_board() {
         } else {
             moveBoardYAxis(50)
         }
+    } else {
+        moveBoardYAxis(80)
     }
 }
 
@@ -161,20 +165,37 @@ function host(restriction) {
 }
 
 function newGame() {
-    updateVariables(
-        [
-            ['gameData', {
-                "players": [variables.gameData.players[0], variables.gameData.players[1]],
-                "player_turn": { 'x': variables.gameData.players[0] },
-                "result": { 'null': null },
-                "board": { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0 },
-                "spaces_left": 9,
-                "in_session": true,
-                "restriction": variables.gameData.restriction,
-            }],
-            ['roomId', variables.roomId]
-        ]
-    );
+    if (variables.gameData.players.length === 2) {
+        updateVariables(
+            [
+                ['gameData', {
+                    "players": [variables.gameData.players[0], variables.gameData.players[1]],
+                    "player_turn": { 'x': variables.gameData.players[0] },
+                    "result": { 'null': null },
+                    "board": { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0 },
+                    "spaces_left": 9,
+                    "in_session": true,
+                    "restriction": variables.gameData.restriction,
+                }],
+                ['roomId', variables.roomId]
+            ]
+        );
+    } else {
+        updateVariables(
+            [
+                ['gameData', {
+                    "players": variables.gameData.players,
+                    "player_turn": { 'x': variables.gameData.players[0] },
+                    "result": { 'null': null },
+                    "board": { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0 },
+                    "spaces_left": 9,
+                    "in_session": false,
+                    "restriction": variables.gameData.restriction,
+                }],
+                ['roomId', variables.roomId]
+            ]
+        );
+    }
     socket.emit('gameplay', [variables.gameData, variables.roomId])
 }
 
@@ -186,11 +207,12 @@ function end(result, players) {
     if (result === undefined && players === undefined) {
         window.location = window.parent.location.origin
     }
+
     // Check if client is a player
     else if (isPlayer) {
         clientIsPlayerX = players[0] === socket.id
         result_e.innerHTML =
-            ((result === 'x' && clientIsPlayerX) || (result === 'o' && !clientIsPlayerX)) ? 'WON' :
+            ((result === 'x' && clientIsPlayerX) || (result === 'o' && !clientIsPlayerX) || result === null) ? 'WON' :
             (result === 'cat') ? 'CAT' : 'LOST'
         visibility(['new-game', 'result', 'room-id', 'side-menu-show-button']);
     } else if (!isPlayer) {
@@ -307,12 +329,30 @@ socket.on('opponent-connect', (opponentId) => {
 
 socket.on('disconnected', (userId) => {
     wasDisconnectUserPlayer = (userId === variables.gameData.players[0] || userId === variables.gameData.players[1])
-    result = (variables.gameData.players[0] === userId) ? 'o' : 'x';
 
-    (wasDisconnectUserPlayer) ?
-    (end(result, variables.gameData.players),
-        socket.emit('gameplay', [variables.gameData, variables.roomId])) :
-    null;
+    playerRemaining = variables.gameData.players.filter(item => item !== userId)[0]
+    whosTurn = Object.keys(variables.gameData.player_turn)[0];
+
+    updateVariables([
+        'gameData', {
+            "players": [playerRemaining],
+            "player_turn": variables.gameData.player_turn,
+            "result": variables.gameData.result,
+            "board": variables.gameData.board,
+            "spaces_left": variables.gameData.spaces_left,
+            "in_session": false,
+            "restriction": variables.gameData.restriction,
+        }
+    ]);
+
+    if (variables.gameData.spaces_left < 9) {
+        (wasDisconnectUserPlayer) ?
+        (
+            end(null, variables.gameData.players),
+            socket.emit('gameplay', [variables.gameData, variables.roomId])
+        ) :
+        null;
+    }
 });
 
 socket.on('restriction', ([searchRoomId, userId]) => {
@@ -337,14 +377,16 @@ socket.on('gameplay', ([data, gameRoomId]) => {
     var newGame = variables.gameData.spaces_left === 9;
     var inSession = variables.gameData.in_session;
 
-    if ((inSession && variables.joined) || (newGame && inSession)) {
+    if (inSession && (variables.joined || newGame)) {
         visibility(['side-menu-show-button', 'room-id']);
         animate_board();
         updateVariables(['joined', false]);
+    } else if (!inSession && variables.gameData.spaces_left === 9) {
+        visibility(['side-menu-show-button', 'room-id', 'title-waiting']);
+        animate_board();
     }
     if (result !== 'null') {
         end(result, variables.gameData.players)
-        variables.gameData.in_session = false;
     }
 
     //Set background image for each box; 1 = x, -1 = o
