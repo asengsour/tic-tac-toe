@@ -78,12 +78,7 @@ function visibility(visible, toggle) {
             var toggle_e = document.getElementsByClassName(e);
             for (var i = 0; i < toggle_e.length; i++) {
                 toggle_e[i].style.display = '';
-                position = null;
                 toggle_e[i].style.visibility = (toggle_e[i].style.visibility === 'visible') ? 'hidden' : 'visible';
-                if (mediaQuery.matches) {
-                    position = (toggle_e[i].style.visibility === 'visible') ? '' : 'center';
-                    animate_board(position);
-                }
             }
 
         }
@@ -112,12 +107,14 @@ function visibility(visible, toggle) {
     }
 }
 
-function animate_board(position) {
+function animate_board() {
     var board_e = document.getElementById("tic-tac-toe-board");
     var join_room_e = document.getElementsByClassName("join-room");
     var title_wait_e = document.getElementsByClassName("title-waiting");
+    var side_menu = document.getElementsByClassName("side-menu");
+    var inPlay = join_room_e[0].style.visibility === 'hidden' && title_wait_e[0].style.visibility === 'hidden' && side_menu[0].style.visibility === 'hidden'
 
-    if (position === 'center' && join_room_e[0].style.visibility === 'hidden' && title_wait_e[0].style.visibility === 'hidden') {
+    if (inPlay) {
         board_e.style.top = '50%';
         board_e.style.transform = "translate(-50%, -50%)"
     } else {
@@ -262,6 +259,7 @@ window.addEventListener('click', (event) => {
     }
     if (event.target.matches('.side-menu-show-button')) {
         visibility(['side-menu'], true)
+        animate_board()
     }
     var playerTurn = Object.values(variables.gameData.player_turn)[0] === socket.id;
     for (var i = 0; i < 9; i++) {
@@ -332,7 +330,7 @@ socket.on('gameplay', ([data, gameRoomId]) => {
 
     if ((inSession && variables.joined) || (newGame && inSession)) {
         visibility(['side-menu-show-button', 'room-id']);
-        animate_board('center');
+        animate_board();
         updateVariables(['joined', false]);
     }
     if (result !== 'null') {
