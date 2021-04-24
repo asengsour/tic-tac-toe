@@ -35,10 +35,11 @@ function makeid(length) {
 
 
 function visibility(visible, action_type) {
+    elements = '.room-id,.result,.new-game,.join-room,.player-status,.start-menu,.side-menu,.side-menu-show-button,.restriction';
     // Make elements visible or toggle
     if (action_type == 'toggle') {
         if (mediaQuery.matches) {
-            $('.active').each(function() {
+            $('.above-board').each(function() {
                 if ($(this).css('display') != 'none') {
                     $(this).css('visibility', ($(this).css('visibility') === 'visible') ? 'hidden' : 'visible')
                 }
@@ -49,7 +50,7 @@ function visibility(visible, action_type) {
     }
     // Update _elements to hide if window size decreased
     else if (action_type == 'decreased') {
-        $('.active').each(function() {
+        $('.above-board').each(function() {
             if ($(this).css('visibility') === 'visible' && $(`${visible}`).css('visibility') === 'visible') {
                 $(this).css('visibility', 'hidden');
             }
@@ -58,7 +59,7 @@ function visibility(visible, action_type) {
     }
     // Update _elements to show if window size increased
     else if (action_type == 'increased') {
-        $('.active').each(function() {
+        $('.above-board').each(function() {
             if ($(this).css('display') != 'none' && $(`.start-menu`).css('visibility') != 'visible') {
                 $(this).css('visibility', 'visible');
             }
