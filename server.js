@@ -47,18 +47,17 @@ io.on('connection', (socket) => {
     var rooms = io.sockets.adapter.rooms;
     var currentRoomId;
 
-    socket.on('search-rooms', ([availableRoom, userId]) => {
-        console.log(availableRoom)
-        if (availableRoom !== false && availableRoom !== 'checked') {
-            io.sockets.to(userId).emit('room-available', availableRoom);
+    socket.on('search-rooms', (availableRoom, userId, isRandomMatch) => {
+        if (availableRoom != null && availableRoom != 'checked') {
+            io.sockets.to(userId).emit('room-available', availableRoom, isRandomMatch);
             currentRoomId = availableRoom;
-        } else if (availableRoom === 'checked') {
-            io.sockets.to(userId).emit('room-available', false);
+        } else if (availableRoom == 'checked') {
+            io.sockets.to(userId).emit('room-available', null, isRandomMatch);
         } else {
             // Go through each room in server
             for (var searchRoomId in rooms) {
                 // Check if room is a game room
-                io.sockets.to(searchRoomId).emit('restriction', [searchRoomId, userId]);
+                io.sockets.to(searchRoomId).emit('restriction', searchRoomId, userId, isRandomMatch);
             }
         }
     });

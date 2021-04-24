@@ -1,4 +1,5 @@
-var socket = io.connect('https://tic-tac-toe-2021.herokuapp.com/');
+// var socket = io.connect('https://tic-tac-toe-2021.herokuapp.com/');
+var socket = io.connect('http://127.0.0.1:80/');
 
 var variables = {
     'roomId': null,
@@ -219,7 +220,7 @@ window.addEventListener('resize', () => {
 window.addEventListener('keyup', (event) => {
     if (event.key == 13 || event.key == 'Enter') {
         if (event.target.matches('#input-room-id')) {
-            joinRoom(event.target.value);
+            socket.emit('search-rooms', event.target.value, socket.id, false);
         }
     }
 });
@@ -228,15 +229,15 @@ window.addEventListener('click', (event) => {
     if (event.target.matches('.host')) {
         visibility('.restriction,.menu-button');
     }
-    if (event.target.matches('.restriction')) {
-        (event.target.innertext === 'Private') ? host('private'): host('public');
+    if (event.target.matches('.choice')) {
+        (event.target.innerText === 'Private') ? host('private'): host('public');
+        (event.target.innerText === 'NEW GAME') ? newGame(): null;
     }
     if (event.target.matches('.join')) {
         visibility('.join-room,.menu-button');
     }
     if (event.target.matches('.random-match')) {
-        socket.emit('search-rooms', [false, socket.id]);
-
+        socket.emit('search-rooms', null, socket.id, true);
     }
     if (event.target.matches('.leave')) {
         end();
@@ -303,13 +304,20 @@ socket.on('disconnected', (userId) => {
     }
 });
 
-socket.on('restriction', ([searchRoomId, userId]) => {
-    roomAvailable = (variables.gameData.restriction === 'public' && variables.gameData.players.length === 1) ? searchRoomId : 'checked';
-    socket.emit('search-rooms', ([roomAvailable, userId]))
+socket.on('restriction', (searchRoomId, userId, isRandomMatch) => {
+    roomAvailable =
+        (isRandomMatch && variables.gameData.restriction === 'public' && variables.gameData.players.length === 1) ? searchRoomId :
+        (!isRandomMatch) ? searchRoomId :
+        'checked';
+    socket.emit('search-rooms', roomAvailable, userId, isRandomMatch)
 });
 
-socket.on('room-available', (availableRoom) => {
-    (availableRoom !== false) ? joinRoom(availableRoom): host('public');
+socket.on('room-available', (availableRoom, isRandomMatch) => {
+    if (availableRoom != null) {
+        joinRoom(availableRoom);
+    } else if (isRandomMatch) {
+        host('public');
+    }
 });
 
 socket.on('gameplay', ([data, gameRoomId]) => {
@@ -331,7 +339,6 @@ socket.on('gameplay', ([data, gameRoomId]) => {
     if (gameResult != undefined) {
         end(gameResult, variables.gameData.players)
     }
-    console.log(inSession, gameResult)
     if (inSession && gameResult == undefined) {
         $('.player-status').css('visibility', 'visible')
         $('.player-status').text(`${Object.keys(variables.gameData.player_turn)[0].toUpperCase()}'s Turn`)
