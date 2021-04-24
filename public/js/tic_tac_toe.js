@@ -47,59 +47,40 @@ function makeid(length) {
 
 
 function visibility(visible, action_type) {
-    elements = ['room-id', 'result', 'new-game',
-        'join-room', 'player-status', 'start-menu',
-        'side-menu', 'side-menu-show-button', 'restriction',
-    ];
-    _elements = [
-        'result', 'join-room', 'player-status', 'restriction'
-    ];
     // Make elements visible or toggle
     if (action_type == 'toggle') {
-        for (var e of visible) {
-            if (mediaQuery.matches) {
-                for (var _e of _elements) {
-                    if ($(`.${_e}`).css('display') != 'none') {
-                        $(`.${_e}`).css('visibility', $(`.${_e}`).css('visibility') == 'hidden' ? 'visible' : 'hidden');
-                    }
+        if (mediaQuery.matches) {
+            $('.active').each(function() {
+                if ($(this).css('display') != 'none') {
+                    $(this).css('visibility', ($(this).css('visibility') === 'visible') ? 'hidden' : 'visible')
                 }
-            }
-            $(`.${e}`).toggle()
-            $(`.${e}`).css('visibility', $(`.${e}`).css('visibility') == 'hidden' ? 'visible' : 'hidden');
+            });
         }
+        $(`${visible}`).toggle();
+        $(`${visible}`).css('visibility', $(`${visible}`).css('visibility') == 'hidden' ? 'visible' : 'hidden');
     }
     // Update _elements to hide if window size decreased
     else if (action_type == 'decreased') {
-        for (var e of visible) {
-            for (var _e of _elements) {
-                if ($(`.${_e}`).css('visibility') === 'visible' && $(`.${e}`).css('visibility') === 'visible') {
-                    $(`.${_e}`).css('visibility', 'hidden');
-                }
+        $('.active').each(function() {
+            if ($(this).css('visibility') === 'visible' && $(`${visible}`).css('visibility') === 'visible') {
+                $(this).css('visibility', 'hidden');
             }
-        }
+        });
         return
     }
     // Update _elements to show if window size increased
     else if (action_type == 'increased') {
-        for (var e of visible) {
-            for (var _e of _elements) {
-                if ($(`.${_e}`).css('display') != 'none' && $(`.start-menu`).css('visibility') != 'visible') {
-                    $(`.${_e}`).css('visibility', 'visible');
-                }
+        $('.active').each(function() {
+            if ($(this).css('display') != 'none' && $(`.start-menu`).css('visibility') != 'visible') {
+                $(this).css('visibility', 'visible');
             }
-        }
+        });
         return
     } else {
-        for (var e of visible) {
-            // Makes visible_elements visible
-            $(`.${e}`).css('display', '');
-            $(`.${e}`).css('visibility', 'visible');
-            // Only hides elements that aren't meant to be visible
-            for (var _e of removeItemAll(elements, e)) {
-                $(`.${_e}`).css('display', 'none');
-                $(`.${_e}`).css('visibility', 'hidden');
-            }
-        }
+        $(`${elements}`).css('display', 'none');
+        $(`${elements}`).css('visibility', 'hidden');
+        $(`${visible}`).css('display', '');
+        $(`${visible}`).css('visibility', 'visible');
     }
     animate_board()
 }
@@ -131,7 +112,7 @@ function joinRoom(roomId) {
 }
 
 function host(restriction) {
-    visibility(['room-id', 'player-status', 'side-menu-show-button']);
+    visibility('.room-id,.player-status,.side-menu-show-button');
     const new_room_id = makeid(5);
     $('.room-id').text(`room id: ${new_room_id}`);
     variables.gameData.restriction = restriction;
@@ -187,9 +168,9 @@ function end(result, players) {
             ((result === 'x' && clientIsPlayerX) || (result === 'o' && !clientIsPlayerX) || result === 'null') ? 'WON' :
             (result === 'cat') ? 'CAT' : 'LOST'
         );
-        visibility(['new-game', 'result', 'room-id', 'side-menu-show-button']);
+        visibility('.new-game,.result,.room-id,.side-menu-show-button');
     } else if (!isPlayer) {
-        visibility(['result', 'room-id', 'side-menu-show-button']);
+        visibility('result,.room-id,.side-menu-show-button');
         if (result !== 'null') {
             $('.result').text(`${result.toUpperCase()} WON`);
         }
@@ -240,9 +221,9 @@ function resultCheck(board, spaces_left) {
 
 window.addEventListener('resize', () => {
     if (window.innerWidth <= 700) {
-        visibility(['side-menu'], 'decreased')
+        visibility('.side-menu', 'decreased')
     } else if (window.innerWidth >= 701) {
-        visibility(['side-menu'], 'increased')
+        visibility('.side-menu', 'increased')
     }
 });
 
@@ -256,13 +237,13 @@ window.addEventListener('keyup', (event) => {
 
 window.addEventListener('click', (event) => {
     if (event.target.matches('.host')) {
-        visibility(['restriction', 'side-menu-show-button']);
+        visibility('.restriction,.side-menu-show-button');
     }
     if (event.target.matches('.restriction')) {
         (event.target.innertext === 'Private') ? host('private'): host('public');
     }
     if (event.target.matches('.join')) {
-        visibility(['join-room', 'side-menu-show-button']);
+        visibility('.join-room,.side-menu-show-button');
     }
     if (event.target.matches('.random-match')) {
         socket.emit('search-rooms', [false, socket.id]);
@@ -272,7 +253,7 @@ window.addEventListener('click', (event) => {
         end();
     }
     if (event.target.matches('.side-menu-show-button')) {
-        visibility(['side-menu'], 'toggle')
+        visibility('.side-menu', 'toggle')
     }
     var isPlayerTurn = Object.values(variables.gameData.player_turn)[0] === socket.id;
     for (var i = 0; i < 9; i++) {
@@ -352,10 +333,10 @@ socket.on('gameplay', ([data, gameRoomId]) => {
     var newGame = variables.gameData.spaces_left === 9;
     var inSession = variables.gameData.in_session;
     if (inSession && (variables.joined || newGame)) {
-        visibility(['side-menu-show-button', 'room-id', 'player-status']);
+        visibility('.side-menu-show-button,.room-id,.player-status');
         updateVariables(['joined', false]);
     } else if (!inSession && variables.gameData.spaces_left == 9) {
-        visibility(['side-menu-show-button', 'room-id', 'player-status']);
+        visibility('side-menu-show-button,.room-id,.player-status');
         $('.player-status').html('Waiting for player' + "<br/>" + ". . .");
     }
     if (gameResult != undefined) {
