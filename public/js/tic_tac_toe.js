@@ -362,9 +362,11 @@ socket.on('gameplay', ([data, gameRoomId]) => {
     ]);
     gameResult = resultCheck(variables.gameData.board, variables.gameData.spaces_left);
     var playerTurn = Object.values(variables.gameData.player_turn)[0] === socket.id;
-    var result = Object.keys((gameResult === 'x') ? { 'x': variables.gameData.players[0] } :
+    var result = Object.keys(
+        (gameResult === 'x') ? { 'x': variables.gameData.players[0] } :
         (gameResult === 'o') ? { 'o': variables.gameData.players[1] } :
-        (gameResult === 'cat') ? { 'cat': null } : { 'null': null })[0];
+        (gameResult === 'cat') ? { 'cat': null } : { 'null': null }
+    )[0];
     var newGame = variables.gameData.spaces_left === 9;
     var inSession = variables.gameData.in_session;
     if (inSession && (variables.joined || newGame)) {
