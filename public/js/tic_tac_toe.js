@@ -7,7 +7,7 @@ var variables = {
     'gameData': {
         "players": [],
         "player_turn": { 'x': null },
-        "result": { 'null': null },
+        "result": { null: null },
         "board": { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0 },
         "spaces_left": 9,
         "in_session": false,
@@ -70,7 +70,7 @@ function visibility(visible, action_type) {
             $(`.${e}`).css('visibility', $(`.${e}`).css('visibility') == 'hidden' ? 'visible' : 'hidden');
         }
     }
-    // Update elements to hide if window size decreased side-menu is visible
+    // Update _elements to hide if window size decreased
     else if (action_type == 'decreased') {
         for (var e of visible) {
             for (var _e of _elements) {
@@ -79,16 +79,18 @@ function visibility(visible, action_type) {
                 }
             }
         }
+        return
     }
-    // Update elements to show if window size increased and side-menu is visible
+    // Update _elements to show if window size increased
     else if (action_type == 'increased') {
         for (var e of visible) {
             for (var _e of _elements) {
-                if ($(`.${_e}`).css('display') != 'none') {
+                if ($(`.${_e}`).css('display') != 'none' && $(`.start-menu`).css('visibility') != 'visible') {
                     $(`.${_e}`).css('visibility', 'visible');
                 }
             }
         }
+        return
     } else {
         for (var e of visible) {
             // Makes visible_elements visible
@@ -138,7 +140,7 @@ function host(restriction) {
         ['gameData', {
             "players": [],
             "player_turn": { 'x': null },
-            "result": { 'null': null },
+            "result": { null: null },
             "board": { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0 },
             "spaces_left": 9,
             "in_session": false,
@@ -156,7 +158,7 @@ function newGame() {
                 ['gameData', {
                     "players": [variables.gameData.players[0], variables.gameData.players[1]],
                     "player_turn": { 'x': variables.gameData.players[0] },
-                    "result": { 'null': null },
+                    "result": { null: null },
                     "board": { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0 },
                     "spaces_left": 9,
                     "in_session": true,
@@ -171,7 +173,7 @@ function newGame() {
                 ['gameData', {
                     "players": variables.gameData.players,
                     "player_turn": { 'x': variables.gameData.players[0] },
-                    "result": { 'null': null },
+                    "result": { null: null },
                     "board": { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0 },
                     "spaces_left": 9,
                     "in_session": false,
@@ -309,7 +311,7 @@ socket.on('opponent-connect', (opponentId) => {
         ['gameData', {
             "players": [variables.gameData.players[0], opponentId],
             "player_turn": { 'x': variables.gameData.players[0] },
-            "result": { 'null': null },
+            "result": { null: null },
             "board": { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0 },
             "spaces_left": 9,
             "in_session": true,
@@ -365,7 +367,7 @@ socket.on('gameplay', ([data, gameRoomId]) => {
     var result = Object.keys(
         (gameResult === 'x') ? { 'x': variables.gameData.players[0] } :
         (gameResult === 'o') ? { 'o': variables.gameData.players[1] } :
-        (gameResult === 'cat') ? { 'cat': null } : { 'null': null }
+        (gameResult === 'cat') ? { 'cat': null } : { null: null }
     )[0];
     var newGame = variables.gameData.spaces_left === 9;
     var inSession = variables.gameData.in_session;
@@ -375,7 +377,7 @@ socket.on('gameplay', ([data, gameRoomId]) => {
     } else if (!inSession && variables.gameData.spaces_left == 9) {
         visibility(['side-menu-show-button', 'room-id', 'title-waiting']);
     }
-    if (result !== 'null') {
+    if (result !== null) {
         end(result, variables.gameData.players)
     }
 
@@ -389,7 +391,7 @@ socket.on('gameplay', ([data, gameRoomId]) => {
             (box_value != 0) ? 1 : ''
         );
         // Set visibility
-        if ((!selected && (!playerTurn || result !== 'null') || newGame)) {
+        if ((!selected && (!playerTurn || result !== null) || newGame)) {
             $(`.box${box_position}`).css('visibility',
                 'hidden'
             );
