@@ -35,7 +35,7 @@ function makeid(length) {
 
 
 function visibility(visible, action_type) {
-    elements = '.room-id,.result,.new-game,.join-room,.player-status,.start-menu,.side-menu,.side-menu-show-button,.restriction';
+    elements = '.room-id,.result,.new-game,.join-room,.player-status,.start-menu,.side-menu,.menu-button,.restriction';
     // Make elements visible or toggle
     if (action_type == 'toggle') {
         if (mediaQuery.matches) {
@@ -101,7 +101,7 @@ function joinRoom(roomId) {
 }
 
 function host(restriction) {
-    visibility('.room-id,.player-status,.side-menu-show-button');
+    visibility('.room-id,.player-status,.menu-button');
     const new_room_id = makeid(5);
     $('.room-id').text(`room id: ${new_room_id}`);
     variables.gameData.restriction = restriction;
@@ -157,9 +157,9 @@ function end(result, players) {
             ((result === 'x' && clientIsPlayerX) || (result === 'o' && !clientIsPlayerX) || result === 'null') ? 'WON' :
             (result === 'cat') ? 'CAT' : 'LOST'
         );
-        visibility('.new-game,.result,.room-id,.side-menu-show-button');
+        visibility('.new-game,.result,.room-id,.menu-button');
     } else if (!isPlayer) {
-        visibility('result,.room-id,.side-menu-show-button');
+        visibility('result,.room-id,.menu-button');
         if (result !== 'null') {
             $('.result').text(`${result.toUpperCase()} WON`);
         }
@@ -226,13 +226,13 @@ window.addEventListener('keyup', (event) => {
 
 window.addEventListener('click', (event) => {
     if (event.target.matches('.host')) {
-        visibility('.restriction,.side-menu-show-button');
+        visibility('.restriction,.menu-button');
     }
     if (event.target.matches('.restriction')) {
         (event.target.innertext === 'Private') ? host('private'): host('public');
     }
     if (event.target.matches('.join')) {
-        visibility('.join-room,.side-menu-show-button');
+        visibility('.join-room,.menu-button');
     }
     if (event.target.matches('.random-match')) {
         socket.emit('search-rooms', [false, socket.id]);
@@ -241,7 +241,7 @@ window.addEventListener('click', (event) => {
     if (event.target.matches('.leave')) {
         end();
     }
-    if (event.target.matches('.side-menu-show-button')) {
+    if (event.target.matches('.menu-button')) {
         visibility('.side-menu', 'toggle')
     }
     var isPlayerTurn = Object.values(variables.gameData.player_turn)[0] === socket.id;
@@ -322,10 +322,10 @@ socket.on('gameplay', ([data, gameRoomId]) => {
     var newGame = variables.gameData.spaces_left === 9;
     var inSession = variables.gameData.in_session;
     if (inSession && (variables.joined || newGame)) {
-        visibility('.side-menu-show-button,.room-id,.player-status');
+        visibility('.menu-button,.room-id,.player-status');
         updateVariables(['joined', false]);
     } else if (!inSession && variables.gameData.spaces_left == 9) {
-        visibility('side-menu-show-button,.room-id,.player-status');
+        visibility('menu-button,.room-id,.player-status');
         $('.player-status').html('Waiting for player' + "<br/>" + ". . .");
     }
     if (gameResult != undefined) {

@@ -277,12 +277,14 @@
     color: rgba(0, 0, 0, 1);
 }
 
-.side-menu-show-button {
+.menu-button {
+    background: center/100% url('../img/menu-button.svg') no-repeat;
     position: absolute;
     border: none;
     display: block;
     visibility: hidden;
     width: 24px;
+    height: 24px;
     z-index: 1;
 }
 
