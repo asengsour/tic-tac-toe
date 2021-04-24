@@ -14,18 +14,6 @@ var variables = {
 }
 const mediaQuery = window.matchMedia('(max-width: 700px)');
 
-function removeItemAll(arr, value) {
-    var i = 0;
-    while (i < arr.length) {
-        if (arr[i] === value) {
-            arr.splice(i, 1);
-        } else {
-            ++i;
-        }
-    }
-    return arr;
-}
-
 function updateVariables(data) {
     if (Array.isArray(data[0])) {
         // values[0] = variables index; values[1] = variable data
