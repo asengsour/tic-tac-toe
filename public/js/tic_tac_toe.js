@@ -39,7 +39,7 @@ function visibility(visible, action_type) {
     // Make elements visible or toggle
     if (action_type == 'toggle') {
         if (mediaQuery.matches) {
-            $('.above-board').each(function() {
+            $('.active').each(function() {
                 if ($(this).css('display') != 'none') {
                     $(this).css('visibility', ($(this).css('visibility') === 'visible') ? 'hidden' : 'visible')
                 }
@@ -50,7 +50,7 @@ function visibility(visible, action_type) {
     }
     // Update _elements to hide if window size decreased
     else if (action_type == 'decreased') {
-        $('.above-board').each(function() {
+        $('.active').each(function() {
             if ($(this).css('visibility') === 'visible' && $(`${visible}`).css('visibility') === 'visible') {
                 $(this).css('visibility', 'hidden');
             }
@@ -59,7 +59,7 @@ function visibility(visible, action_type) {
     }
     // Update _elements to show if window size increased
     else if (action_type == 'increased') {
-        $('.above-board').each(function() {
+        $('.active').each(function() {
             if ($(this).css('display') != 'none' && $(`.start-menu`).css('visibility') != 'visible') {
                 $(this).css('visibility', 'visible');
             }
