@@ -1,5 +1,3 @@
-// npm run start
-
 // imports
 require('dotenv').config()
 const path = require('path');
