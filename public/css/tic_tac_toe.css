@@ -62,7 +62,7 @@
         font-size: 24px;
         height: 1.2em;
     }
-    .title-waiting {
+    .player-status {
         width: 100%;
         left: 50%;
         transform: translate(-50%, -12.5%);
@@ -115,14 +115,14 @@
         width: 6em;
         height: 1.2em;
         left: 50%;
-        top: 12.5%;
-        transform: translate(-50%, -12.5%);
+        top: 6.25%;
+        transform: translate(-50%, -6.25%);
         font-size: 96px;
     }
     .restriction.container {
         left: calc(50% + 1.2em/2);
-        top: 12.5%;
-        transform: translate(-50%, -12.5%);
+        top: 6.25%;
+        transform: translate(-50%, -6.25%);
     }
     .restriction.choice {
         width: 6em;
@@ -140,9 +140,9 @@
     .join-room.container {
         max-width: 256px;
         max-height: 256px;
-        top: 12.5%;
+        top: 6.25%;
         left: 50%;
-        transform: translate(-50%, -12.5%);
+        transform: translate(-50%, -6.25%);
     }
     #input-room-id {
         font-size: 16px;
@@ -154,11 +154,11 @@
         font-size: 32px;
         height: 1.2em;
     }
-    .title-waiting {
+    .player-status {
         max-width: 256px;
         left: 50%;
-        transform: translate(-50%, -12.5%);
-        top: 12.5%;
+        transform: translate(-50%, -6.25%);
+        top: 6.25%;
         font-size: 32px;
     }
     .start-menu.container {
@@ -388,7 +388,7 @@
 //////
 */
 
-.title-waiting {
+.player-status {
     position: absolute;
     white-space: nowrap;
     text-align: center;
