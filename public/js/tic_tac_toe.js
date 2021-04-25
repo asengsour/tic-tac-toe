@@ -230,8 +230,9 @@ window.addEventListener('click', (event) => {
         visibility('.restriction,.menu-button');
     }
     if (event.target.matches('.choice')) {
-        (event.target.innerText === 'Private') ? host('private'): host('public');
-        (event.target.innerText === 'NEW GAME') ? newGame(): null;
+        (event.target.innerText === 'Private') ? host('private'):
+            (event.target.innerText === 'NEW GAME') ? newGame() :
+            host('public');
     }
     if (event.target.matches('.join')) {
         visibility('.join-room,.menu-button');
