@@ -78,8 +78,7 @@ function visibility(visible, action_type) {
 function animate_board() {
     var inPlay = $('.join-room').css('visibility') == 'hidden' &&
         $('.restriction').css('visibility') == 'hidden' &&
-        $('.new-game').css('visibility') == 'hidden' &&
-        $('.result').css('visibility') == 'hidden'
+        $('.new-game').css('visibility') == 'hidden'
     var sideMenuVisible = $('.side-menu').css('visibility') !== 'hidden'
 
     function moveBoardYAxis(yAxisPercentage) {
