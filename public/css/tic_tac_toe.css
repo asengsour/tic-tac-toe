@@ -29,7 +29,7 @@
         font-size: 64px;
     }
     .restriction.container {
-        left: calc(50% + 1.2em/2);
+        left: 50%;
         top: 12.5%;
         transform: translate(-50%, -12.5%);
     }
@@ -39,12 +39,16 @@
         border-radius: 30px;
         font-size: 16px;
     }
-    .new-game.choice {
-        width: calc((80vw/3) - 2vw*2);
-        max-width: calc((80vw/3) - 2vw*2);
-        height: 2em;
-        border-radius: 30px;
+    .binary-choice.choice {
         font-size: 16px;
+    }
+    .new-game.title {
+        font-size: 24px;
+    }
+    .new-game.container {
+        height: 12.5%;
+        left: 50%;
+        top: calc(25% + 12.5%/2);
     }
     .join-room.container {
         width: 50%;
@@ -120,7 +124,7 @@
         font-size: 96px;
     }
     .restriction.container {
-        left: calc(50% + 1.2em/2);
+        left: 50%;
         top: 6.25%;
         transform: translate(-50%, -6.25%);
     }
@@ -130,12 +134,16 @@
         border-radius: 30px;
         font-size: 20px;
     }
-    .new-game.choice {
-        min-width: calc((400px/3) - 8px*2);
-        max-width: calc((450px/3) - 8px*2);
-        height: 2em;
-        border-radius: 30px;
+    .binary-choice.choice {
         font-size: 20px;
+    }
+    .new-game.title {
+        font-size: 32px;
+    }
+    .new-game.container {
+        height: 12.5%;
+        left: 50%;
+        top: calc(25%);
     }
     .join-room.container {
         max-width: 256px;
@@ -157,8 +165,8 @@
     .player-status {
         max-width: 256px;
         left: 50%;
-        transform: translate(-50%, -6.25%);
         top: 6.25%;
+        transform: translate(-50%, -6.25%);
         font-size: 32px;
     }
     .start-menu.container {
@@ -243,7 +251,7 @@
 .start-menu.container {
     display: grid;
     gap: 1.2em;
-    grid-template-rows: auto auto auto;
+    grid-template-rows: auto auto;
     position: absolute;
     visibility: visible;
 }
@@ -300,7 +308,7 @@
     display: grid;
     visibility: hidden;
     gap: 1.2em;
-    grid-template-columns: auto auto auto;
+    grid-template-columns: auto auto;
 }
 
 .restriction.choice {
@@ -325,7 +333,7 @@
     display: grid;
     visibility: hidden;
     gap: 1.2em;
-    grid-template-rows: auto auto auto;
+    grid-template-rows: auto auto;
     position: absolute;
     justify-content: center;
     align-content: center;
@@ -361,19 +369,51 @@
 //////////
 */
 
-.new-game.choice {
-    z-index: 1;
+.new-game.container {
+    width: auto;
+    transform: translate(-50%, -50%);
+    visibility: hidden;
+    position: absolute;
+    display: grid;
+    grid-template-rows: auto auto;
+}
+
+.binary-choice.container {
+    gap: .4em;
+    grid-template-columns: auto auto;
+    display: grid;
+}
+
+.binary-choice.choice {
+    font-weight: 350;
+    width: 3em;
+    height: 2em;
+    position: relative;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    position: absolute;
+    border-radius: 30px;
     font-family: Helvetica Neue;
-    font-weight: 350;
     color: white;
     background-color: black;
     line-height: 1.5;
     display: flex;
-    visibility: hidden;
+    align-items: center;
+    justify-content: center;
+}
+
+.new-game.title {
+    width: auto;
+    height: 1.2em;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    position: relative;
+    font-family: Helvetica Neue;
+    font-weight: 350;
+    color: block;
+    line-height: 1.5;
+    display: flex;
     align-items: center;
     justify-content: center;
 }

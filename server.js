@@ -44,23 +44,51 @@ app.get('', (req, res) => {
 io.on('connection', (socket) => {
     var rooms = io.sockets.adapter.rooms;
     var currentRoomId;
+    var availableRooms = []
 
-    socket.on('search-rooms', (availableRoom, userId, isRandomMatch) => {
-        if (availableRoom != null && availableRoom != 'checked') {
-            io.sockets.to(userId).emit('room-available', availableRoom, isRandomMatch);
-            currentRoomId = availableRoom;
-        } else if (availableRoom == 'checked') {
-            io.sockets.to(userId).emit('room-available', null, isRandomMatch);
-        } else {
+    socket.on('search-rooms', (availableRoom, userId, isRandomMatch, roomCount, numOfGameRooms) => {
+        // Random match search initated
+        if (availableRoom == null) {
             // Go through each room in server
+            numOfGameRooms = 0
+            for (var room in rooms) {
+                if (room.length == 5) {
+                    numOfGameRooms++
+                }
+            }
             for (var searchRoomId in rooms) {
-                // Check if room is a game room
-                io.sockets.to(searchRoomId).emit('restriction', searchRoomId, userId, isRandomMatch);
+                if (searchRoomId.length == 5) {
+                    roomCount++
+                    // Check if room is a game room
+                    io.sockets.to(searchRoomId).emit('search-rooms', searchRoomId, userId, isRandomMatch, roomCount, numOfGameRooms, availableRooms);
+                }
             }
         }
+        // Found public room, adding to array
+        if (availableRoom != null && availableRoom != 'checked') {
+            if (availableRoom.length == 5) {
+                availableRooms.push(availableRoom)
+            }
+        }
+        // (Checked all rooms or no rooms available) and not on initation
+        if (availableRoom != null && roomCount === numOfGameRooms || numOfGameRooms === 0) {
+            console.log(roomCount, numOfGameRooms)
+            if (availableRooms.length > 0) {
+                room = availableRooms[Math.floor(Math.random() * availableRooms.length)]
+                io.sockets.to(userId).emit('room-available', room, isRandomMatch);
+                currentRoomId = room;
+            } else {
+                io.sockets.to(userId).emit('room-available', null, isRandomMatch);
+            }
+        }
+
+        console.log(roomCount, availableRooms, Object.keys(io.sockets.adapter.rooms), numOfGameRooms)
     });
     socket.on('gameplay', ([data, roomId]) => {
         io.sockets.to(roomId).emit('gameplay', [data, roomId]);
+    });
+    socket.on('new-game', (roomId, userId) => {
+        io.sockets.to(roomId).emit('new-game', roomId, userId);
     });
     socket.on('host', ([restriction, roomId]) => {
         gameData = {

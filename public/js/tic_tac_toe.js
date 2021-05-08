@@ -1,5 +1,5 @@
-var socket = io.connect('https://tic-tac-toe-2021.herokuapp.com/');
-// var socket = io.connect('http://127.0.0.1:80/');
+// var socket = io.connect('https://tic-tac-toe-2021.herokuapp.com/');
+var socket = io.connect('http://127.0.0.1:80/');
 
 var variables = {
     'roomId': null,
@@ -17,7 +17,7 @@ const mediaQuery = window.matchMedia('(max-width: 700px)');
 
 function updateVariables(data) {
     if (Array.isArray(data[0])) {
-        // values[0] = variables index; values[1] = variable data
+        // data[0] = variables index; data[1] = variable data
         data.forEach(values => variables[values[0]] = values[1]);
     } else {
         variables[data[0]] = data[1];
@@ -76,7 +76,10 @@ function visibility(visible, action_type) {
 }
 
 function animate_board() {
-    var inPlay = $('.join-room').css('visibility') == 'hidden' && $('.restriction').css('visibility') == 'hidden'
+    var inPlay = $('.join-room').css('visibility') == 'hidden' &&
+        $('.restriction').css('visibility') == 'hidden' &&
+        $('.new-game').css('visibility') == 'hidden' &&
+        $('.result').css('visibility') == 'hidden'
     var sideMenuVisible = $('.side-menu').css('visibility') !== 'hidden'
 
     function moveBoardYAxis(yAxisPercentage) {
@@ -97,7 +100,7 @@ function animate_board() {
 
 function joinRoom(roomId) {
     socket.emit('join-room', roomId);
-    socket.emit('opponent-connect', [socket.id, roomId])
+    socket.emit('opponent-connect', [socket.id, roomId]);
     $('.room-id').text(`room id: ${roomId}`);
 }
 
@@ -108,39 +111,6 @@ function host(restriction) {
     variables.gameData.restriction = restriction;
     variables.joined = true;
     socket.emit('host', [restriction, new_room_id]);
-}
-
-function newGame() {
-    if (variables.gameData.players.length === 2) {
-        updateVariables(
-            [
-                ['gameData', {
-                    "players": [variables.gameData.players[0], variables.gameData.players[1]],
-                    "player_turn": { 'x': variables.gameData.players[0] },
-                    "board": { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0 },
-                    "spaces_left": 9,
-                    "in_session": true,
-                    "restriction": variables.gameData.restriction,
-                }],
-                ['roomId', variables.roomId]
-            ]
-        );
-    } else {
-        updateVariables(
-            [
-                ['gameData', {
-                    "players": variables.gameData.players,
-                    "player_turn": { 'x': variables.gameData.players[0] },
-                    "board": { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0 },
-                    "spaces_left": 9,
-                    "in_session": false,
-                    "restriction": variables.gameData.restriction,
-                }],
-                ['roomId', variables.roomId]
-            ]
-        );
-    }
-    socket.emit('gameplay', [variables.gameData, variables.roomId])
 }
 
 function end(result, players) {
@@ -166,6 +136,31 @@ function end(result, players) {
         }
     }
     variables.gameData.in_session = false;
+}
+
+function updateBoard(gameData) {
+    //Set background image for each box; 1 = x, -1 = o, 0 = null
+    var isPlayerTurn = Object.values(gameData.player_turn)[0] === socket.id;
+    var gameResult = resultCheck(gameData.board, gameData.spaces_left);
+    Object.entries(gameData.board).forEach(entry => {
+        var [box_position, box_value] = entry;
+        var selected = box_value != 0;
+        $(`.box${box_position}`).css('display', 'inherit');
+        // Set boxes state based on box value
+        $(`.box${box_position}`).css('opacity',
+            (selected) ? 1 : ''
+        );
+        //Set background-imagge
+        $(`.box${box_position}`).css('background-image',
+            (box_value == 1) ? `url('../img/x.svg')` :
+            (box_value == -1) ? `url('../img/o.svg')` :
+            `url('../img/${Object.keys(gameData.player_turn)[0]}.svg')`
+        );
+        // Set visibility
+        $(`.box${box_position}`).css('visibility',
+            ((isPlayerTurn && gameResult == undefined) || selected) ? 'visible' : 'hidden'
+        );
+    });
 }
 
 function resultCheck(board, spaces_left) {
@@ -216,7 +211,6 @@ window.addEventListener('resize', () => {
         visibility('.side-menu', 'increased')
     }
 });
-
 window.addEventListener('keyup', (event) => {
     if (event.key == 13 || event.key == 'Enter') {
         if (event.target.matches('#input-room-id')) {
@@ -231,14 +225,16 @@ window.addEventListener('click', (event) => {
     }
     if (event.target.matches('.choice')) {
         (event.target.innerText === 'Private') ? host('private'):
-            (event.target.innerText === 'NEW GAME') ? newGame() :
-            host('public');
+            (event.target.innerText === 'Public') ? host('public') :
+            (event.target.innerText === 'Yes') ?
+            socket.emit('new-game', variables.roomId, socket.id) :
+            end();
     }
     if (event.target.matches('.join')) {
         visibility('.join-room,.menu-button');
     }
     if (event.target.matches('.random-match')) {
-        socket.emit('search-rooms', null, socket.id, true);
+        socket.emit('search-rooms', null, socket.id, true, 0);
     }
     if (event.target.matches('.leave')) {
         end();
@@ -246,6 +242,7 @@ window.addEventListener('click', (event) => {
     if (event.target.matches('.menu-button')) {
         visibility('.side-menu', 'toggle')
     }
+    // For each box of board; emit chosen to game room
     var isPlayerTurn = Object.values(variables.gameData.player_turn)[0] === socket.id;
     for (var i = 0; i < 9; i++) {
         // Only updates if box not clicked and in session
@@ -280,7 +277,7 @@ socket.on('opponent-connect', (opponentId) => {
     socket.emit('gameplay', [variables.gameData, variables.roomId])
 });
 
-socket.on('disconnected', (userId) => {
+socket.on('disconnected', (roomId, userId) => {
     wasDisconnectUserPlayer = (userId === variables.gameData.players[0] || userId === variables.gameData.players[1])
 
     playerRemaining = variables.gameData.players.filter(item => item !== userId)[0]
@@ -305,19 +302,55 @@ socket.on('disconnected', (userId) => {
     }
 });
 
-socket.on('restriction', (searchRoomId, userId, isRandomMatch) => {
+socket.on('search-rooms', (searchRoomId, userId, isRandomMatch, iter, numOfGameRooms) => {
     roomAvailable =
-        (isRandomMatch && variables.gameData.restriction === 'public' && variables.gameData.players.length === 1) ? searchRoomId :
-        (!isRandomMatch) ? searchRoomId :
+        ((isRandomMatch && variables.gameData.restriction === 'public' && variables.gameData.players.length === 1) || !isRandomMatch) ? searchRoomId :
         'checked';
-    socket.emit('search-rooms', roomAvailable, userId, isRandomMatch)
+    socket.emit('search-rooms', roomAvailable, userId, isRandomMatch, iter, numOfGameRooms)
 });
 
 socket.on('room-available', (availableRoom, isRandomMatch) => {
+    console.log(availableRoom, isRandomMatch)
     if (availableRoom != null) {
         joinRoom(availableRoom);
-    } else if (isRandomMatch) {
+    } else if (isRandomMatch && availableRoom == null) {
         host('public');
+    }
+});
+
+socket.on('new-game', (roomId, userId) => {
+    if (variables.gameData.in_session == false) {
+        updateVariables([
+            'gameData', {
+                "players": variables.gameData.players,
+                "player_turn": { 'x': variables.gameData.players[0] },
+                "board": { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0 },
+                "spaces_left": 9,
+                "in_session": 'pending',
+                "restriction": variables.gameData.restriction,
+            }
+        ]);
+    } else if (variables.gameData.in_session == 'pending') {
+        updateVariables(
+            ['gameData', {
+                "players": variables.gameData.players,
+                "player_turn": { 'x': variables.gameData.players[0] },
+                "board": { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0 },
+                "spaces_left": 9,
+                "in_session": (variables.gameData.players.length == 2) ? true : false,
+                "restriction": variables.gameData.restriction,
+            }]
+        );
+    };
+    // Update layout for first player to chose to start new game
+    if (userId == socket.id && variables.gameData.in_session == 'pending') {
+        updateBoard(variables.gameData);
+        visibility('.menu-button,.room-id,.player-status');
+        $('.player-status').html('Waiting for player' + "<br/>" + ". . .");
+    }
+    // Start gameplay if both players chose to start new game
+    else if (variables.gameData.in_session == true) {
+        socket.emit('gameplay', [variables.gameData, variables.roomId])
     }
 });
 
@@ -327,43 +360,34 @@ socket.on('gameplay', ([data, gameRoomId]) => {
         ['roomId', gameRoomId]
     ]);
     var gameResult = resultCheck(variables.gameData.board, variables.gameData.spaces_left);
-    var isPlayerTurn = Object.values(variables.gameData.player_turn)[0] === socket.id;
     var newGame = variables.gameData.spaces_left === 9;
     var inSession = variables.gameData.in_session;
+
+    // Set visible layout to game in session
     if (inSession && (variables.joined || newGame)) {
         visibility('.menu-button,.room-id,.player-status');
         updateVariables(['joined', false]);
-    } else if (!inSession && variables.gameData.spaces_left == 9) {
-        visibility('menu-button,.room-id,.player-status');
+    }
+    //Set visible layout to game wiating to be in session
+    else if (!inSession && newGame) {
+        visibility('.menu-button,.room-id,.player-status');
         $('.player-status').html('Waiting for player' + "<br/>" + ". . .");
     }
+    //End game if result has occured
     if (gameResult != undefined) {
         end(gameResult, variables.gameData.players)
     }
+    //Set client and player turn status
     if (inSession && gameResult == undefined) {
         $('.player-status').css('visibility', 'visible')
-        $('.player-status').text(`${Object.keys(variables.gameData.player_turn)[0].toUpperCase()}'s Turn`)
+        if (variables.gameData.players.includes(socket.id)) {
+            $('.player-status').html((Object.values(variables.gameData.player_turn)[0] == socket.id) ? "Your Turn" :
+                `${Object.keys(variables.gameData.player_turn)[0].toUpperCase()}'s Turn`)
+        } else {
+            $('.player-status').html('Spectating' + "<br/>" + "<br/>" + `${Object.keys(variables.gameData.player_turn)[0].toUpperCase()}'s Turn`);
+        }
     }
-    //Set background image for each box; 1 = x, -1 = o
-    Object.entries(variables.gameData.board).forEach(entry => {
-        var [box_position, box_value] = entry;
-        var selected = box_value != 0;
-        $(`.box${box_position}`).css('display', 'inherit');
-        // Set boxes state based on box value
-        $(`.box${box_position}`).css('opacity',
-            (selected) ? 1 : ''
-        );
-        //Set background-imagge
-        $(`.box${box_position}`).css('background-image',
-            (box_value == 1) ? `url('../img/x.svg')` :
-            (box_value == -1) ? `url('../img/o.svg')` :
-            `url('../img/${Object.keys(variables.gameData.player_turn)[0]}.svg')`
-        );
-        // Set visibility
-        $(`.box${box_position}`).css('visibility',
-            ((isPlayerTurn && gameResult == undefined) || selected) ? 'visible' : 'hidden'
-        );
-    });
+    updateBoard(variables.gameData)
 });
 
 socket.on('join-room', () => {

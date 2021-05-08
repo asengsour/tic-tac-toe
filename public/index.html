@@ -7,8 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>tic-tac-toe</title>
     <link rel="stylesheet" type="text/css" id="applicationStylesheet" href="css/tic_tac_toe.css" />
-    <script type="text/javascript" src="https://tic-tac-toe-2021.herokuapp.com/socket.io/socket.io.js"></script>
-    <!-- <script type="text/javascript" src="http://127.0.0.1:80/socket.io/socket.io.js"></script> -->
+    <!-- <script type="text/javascript" src="https://tic-tac-toe-2021.herokuapp.com/socket.io/socket.io.js"></script> -->
+    <script type="text/javascript" src="http://127.0.0.1:80/socket.io/socket.io.js"></script>
     <script language="JavaScript" type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script language="JavaScript" type="text/javascript" src="js/tic_tac_toe.js"></script>
 </head>
@@ -17,7 +17,6 @@
 
     <div class="main-bg">
         <div id="tic-tac-toe-board">
-            <span class="new-game choice">NEW GAME</span>
             <div class="box0 box">
             </div>
             <div class="box1 box">
@@ -61,6 +60,14 @@
         <div class="restriction active container">
             <span id="private" class="restriction active choice">Private</span>
             <span id="public" class="restriction active choice">Public</span>
+        </div>
+
+        <div class="new-game container">
+            <span class="new-game title">NEW GAME</span>
+            <div class="binary-choice active container">
+                <span id="yes" class="binary-choice active choice">Yes</span>
+                <span id="no" class="binary-choice active choice">No</span>
+            </div>
         </div>
 
         <span class="room-id">room id: jSc5e</span>
