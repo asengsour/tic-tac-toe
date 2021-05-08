@@ -163,7 +163,7 @@
         height: 1.2em;
     }
     .player-status {
-        max-width: 256px;
+        max-width: 50%;
         left: 50%;
         top: 6.25%;
         transform: translate(-50%, -6.25%);
