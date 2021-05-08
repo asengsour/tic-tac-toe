@@ -295,25 +295,6 @@ window.addEventListener('click', (event) => {
     }
 });
 
-
-
-// socket.on('opponent-connect', (opponentId) => {
-//     updateVariables([
-//         ['gameData', {
-//             "players": [variables.gameData.players[0], opponentId],
-//             "player_turn": { 'x': variables.gameData.players[0] },
-//             "board": { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0 },
-//             "spaces_left": 9,
-//             "in_session": true,
-//             "restriction": variables.gameData.restriction,
-//         }],
-//         ['roomId', variables.roomId]
-//     ]);
-//     socket.emit('data-update', [variables.gameData, variables.roomId])
-// });
-
-
-
 socket.on('search-rooms-restriction', (searchRoomId, userId, isRandomMatch, iter, numOfGameRooms) => {
     roomAvailable =
         ((isRandomMatch && variables.gameData.restriction === 'public' && variables.gameData.players.length === 1) || !isRandomMatch) ? searchRoomId :
@@ -375,24 +356,6 @@ socket.on('data-update', ([data, roomId]) => {
         ['gameData', data],
         ['roomId', roomId]
     ]);
-
-    // // Set visible layout to game in session
-    // if (inSession == true && (variables.joined || newGame)) {
-    //     visibility('.menu-button,.room-id,.player-status');
-    // }
-    // // Wait for player to join host from new game room
-    // else if (inSession == false && newGame && numOfPlayers == 1) {
-    //     visibility('.menu-button,.room-id,.player-status');
-    //     $('.player-status').html('Waiting for Player to Join');
-    // }
-    // // Opponent disconnected, waiting for one to join
-    // else if (inSession == 'pending' && numOfPlayers == 1) {
-    //     visibility('.menu-button,.room-id,.player-status');
-    // }
-    // // Opponent disconnected and game was in play
-    // else if (inSession == false && !newGame && numOfPlayers == 1) {
-    //     visibility('.new-game,.result,.room-id,.menu-button');
-    // }
     var gameResult = resultCheck(variables.gameData.board, variables.gameData.spaces_left);
     var inSession = variables.gameData.in_session;
     //End game if result has occured
