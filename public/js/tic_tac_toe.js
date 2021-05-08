@@ -1,5 +1,5 @@
-var socket = io.connect('https://tic-tac-toe-2021.herokuapp.com/');
-// var socket = io.connect('http://127.0.0.1:80/');
+// var socket = io.connect('https://tic-tac-toe-2021.herokuapp.com/');
+var socket = io.connect('http://127.0.0.1:80/');
 
 var variables = {
     'roomId': null,
@@ -99,40 +99,76 @@ function animate_board() {
 }
 
 function joinRoom(roomId) {
-    socket.emit('join-room', roomId);
-    socket.emit('opponent-connect', [socket.id, roomId]);
+    socket.emit('join-room', roomId, socket.id);
+    // socket.emit('opponent-connect', [socket.id, roomId]);
+    updateVariables(['joined', true])
     $('.room-id').text(`room id: ${roomId}`);
 }
 
 function host(restriction) {
     visibility('.room-id,.player-status,.menu-button');
     const new_room_id = makeid(5);
+    $('.player-status').html('Waiting for Player to Join');
     $('.room-id').text(`room id: ${new_room_id}`);
     variables.gameData.restriction = restriction;
-    variables.joined = true;
+    // variables.joined = true;
     socket.emit('host', [restriction, new_room_id]);
 }
 
+socket.on('disconnected', (userId) => {
+    wasDisconnectUserPlayer = (userId === variables.gameData.players[0] || userId === variables.gameData.players[1]);
+    // If player disconencted end
+    if (wasDisconnectUserPlayer) {
+        playerRemaining = variables.gameData.players.filter(item => item !== userId)[0];
+        updateVariables([
+            'gameData', {
+                "players": [playerRemaining],
+                "player_turn": { 'x': playerRemaining },
+                "board": variables.gameData.board,
+                "spaces_left": variables.gameData.spaces_left,
+                "in_session": variables.gameData.in_session,
+                "restriction": variables.gameData.restriction,
+            }
+        ]);
+        end(null, [playerRemaining]);
+        $('.player-status').html('Opponent disconnected');
+        socket.emit('data-update', [variables.gameData, variables.roomId]);
+    }
+});
+
 function end(result, players) {
-    var isPlayer = socket.id === variables.gameData.players[0] || socket.id === variables.gameData.players[1];
+    var isPlayer = players.includes(socket.id);
 
     // Refresh website
     if (result === undefined && players === undefined) {
         window.location = window.parent.location.origin
     }
-
-    // Check if client is a player
-    else if (isPlayer) {
-        clientIsPlayerX = players[0] === socket.id
-        $('.result').text(
-            ((result === 'x' && clientIsPlayerX) || (result === 'o' && !clientIsPlayerX) || result === 'null') ? 'WON' :
-            (result === 'cat') ? 'CAT' : 'LOST'
-        );
-        visibility('.new-game,.result,.room-id,.menu-button');
-    } else if (!isPlayer) {
-        visibility('result,.room-id,.menu-button');
-        if (result !== 'null') {
-            $('.result').text(`${result.toUpperCase()} WON`);
+    console.log(players)
+        // Game was unfished
+    if (players.length == 1) {
+        if (isPlayer) {
+            visibility('.new-game,.player-status,.room-id,.menu-button');
+        }
+        if (!isPlayer) {
+            visibility('.player-status,.room-id,.menu-button');
+        }
+    }
+    // Game finished
+    else if (players.length == 2) {
+        if (isPlayer) {
+            clientIsPlayerX = players[0] === socket.id
+            $('.result').text(
+                ((result === 'x' && clientIsPlayerX) || (result === 'o' && !clientIsPlayerX) || result === 'null') ? 'WON' :
+                (result === 'cat') ? 'CAT' : 'LOST'
+            );
+            visibility('.new-game,.result,.room-id,.menu-button');
+        }
+        // Spectator 
+        else if (!isPlayer) {
+            visibility('result,.room-id,.menu-button');
+            if (result !== 'null') {
+                $('.result').text(`${result.toUpperCase()} WON`);
+            }
         }
     }
     variables.gameData.in_session = false;
@@ -246,7 +282,7 @@ window.addEventListener('click', (event) => {
     var isPlayerTurn = Object.values(variables.gameData.player_turn)[0] === socket.id;
     for (var i = 0; i < 9; i++) {
         // Only updates if box not clicked and in session
-        if (event.target.matches(`.box${[i]}`) && isPlayerTurn && variables.gameData.in_session) {
+        if (event.target.matches(`.box${[i]}`) && isPlayerTurn && variables.gameData.in_session == true) {
             box_position = event.target.className.split(' ')[0][3];
             //Change board value to which box was clicked or tapped
             variables.gameData.board[box_position] = (Object.keys(variables.gameData.player_turn)[0] === 'x') ? 1 : -1;
@@ -255,52 +291,29 @@ window.addEventListener('click', (event) => {
             //Change turn to other player
             variables.gameData.player_turn = (Object.keys(variables.gameData.player_turn)[0] === 'x') ? { 'o': variables.gameData.players[1] } : { 'x': variables.gameData.players[0] };
 
-            socket.emit('gameplay', [variables.gameData, variables.roomId])
+            socket.emit('data-update', [variables.gameData, variables.roomId])
         }
     }
 });
 
 
 
-socket.on('opponent-connect', (opponentId) => {
-    updateVariables([
-        ['gameData', {
-            "players": [variables.gameData.players[0], opponentId],
-            "player_turn": { 'x': variables.gameData.players[0] },
-            "board": { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0 },
-            "spaces_left": 9,
-            "in_session": true,
-            "restriction": variables.gameData.restriction,
-        }],
-        ['roomId', variables.roomId]
-    ]);
-    socket.emit('gameplay', [variables.gameData, variables.roomId])
-});
+// socket.on('opponent-connect', (opponentId) => {
+//     updateVariables([
+//         ['gameData', {
+//             "players": [variables.gameData.players[0], opponentId],
+//             "player_turn": { 'x': variables.gameData.players[0] },
+//             "board": { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0 },
+//             "spaces_left": 9,
+//             "in_session": true,
+//             "restriction": variables.gameData.restriction,
+//         }],
+//         ['roomId', variables.roomId]
+//     ]);
+//     socket.emit('data-update', [variables.gameData, variables.roomId])
+// });
 
-socket.on('disconnected', (roomId, userId) => {
-    wasDisconnectUserPlayer = (userId === variables.gameData.players[0] || userId === variables.gameData.players[1])
 
-    playerRemaining = variables.gameData.players.filter(item => item !== userId)[0]
-    whosTurn = Object.keys(variables.gameData.player_turn)[0];
-
-    if (wasDisconnectUserPlayer && variables.gameData.in_session == true) {
-        updateVariables([
-            'gameData', {
-                "players": [playerRemaining],
-                "player_turn": variables.gameData.player_turn,
-                "board": variables.gameData.board,
-                "spaces_left": variables.gameData.spaces_left,
-                "in_session": false,
-                "restriction": variables.gameData.restriction,
-            }
-        ]);
-
-        if (variables.gameData.spaces_left < 9) {
-            end(null, variables.gameData.players)
-        }
-        socket.emit('gameplay', [variables.gameData, variables.roomId]);
-    }
-});
 
 socket.on('search-rooms-restriction', (searchRoomId, userId, isRandomMatch, iter, numOfGameRooms) => {
     roomAvailable =
@@ -310,7 +323,6 @@ socket.on('search-rooms-restriction', (searchRoomId, userId, isRandomMatch, iter
 });
 
 socket.on('room-available', (availableRoom, isRandomMatch) => {
-    console.log(availableRoom, isRandomMatch)
     if (availableRoom != null) {
         joinRoom(availableRoom);
     } else if (isRandomMatch && availableRoom == null) {
@@ -346,39 +358,51 @@ socket.on('new-game', (roomId, userId) => {
     if (userId == socket.id && variables.gameData.in_session == 'pending') {
         updateBoard(variables.gameData);
         visibility('.menu-button,.room-id,.player-status');
-        $('.player-status').html('Waiting for player' + "<br/>" + ". . .");
+        if (variables.gameData.players.length == 2) {
+            $('.player-status').html('Waiting for Player to Choose');
+        } else {
+            $('.player-status').html('Waiting for Player to Join');
+        }
     }
-    // Start gameplay if both players chose to start new game
+    // Start data-update if both players chose to start new game
     else if (variables.gameData.in_session == true) {
-        socket.emit('gameplay', [variables.gameData, variables.roomId])
+        visibility('.menu-button,.room-id,.player-status');
+        socket.emit('data-update', [variables.gameData, variables.roomId])
     }
 });
 
-socket.on('gameplay', ([data, gameRoomId]) => {
+socket.on('data-update', ([data, roomId]) => {
     updateVariables([
         ['gameData', data],
-        ['roomId', gameRoomId]
+        ['roomId', roomId]
     ]);
+
+    // // Set visible layout to game in session
+    // if (inSession == true && (variables.joined || newGame)) {
+    //     visibility('.menu-button,.room-id,.player-status');
+    // }
+    // // Wait for player to join host from new game room
+    // else if (inSession == false && newGame && numOfPlayers == 1) {
+    //     visibility('.menu-button,.room-id,.player-status');
+    //     $('.player-status').html('Waiting for Player to Join');
+    // }
+    // // Opponent disconnected, waiting for one to join
+    // else if (inSession == 'pending' && numOfPlayers == 1) {
+    //     visibility('.menu-button,.room-id,.player-status');
+    // }
+    // // Opponent disconnected and game was in play
+    // else if (inSession == false && !newGame && numOfPlayers == 1) {
+    //     visibility('.new-game,.result,.room-id,.menu-button');
+    // }
     var gameResult = resultCheck(variables.gameData.board, variables.gameData.spaces_left);
-    var newGame = variables.gameData.spaces_left === 9;
     var inSession = variables.gameData.in_session;
 
-    // Set visible layout to game in session
-    if (inSession && (variables.joined || newGame)) {
-        visibility('.menu-button,.room-id,.player-status');
-        updateVariables(['joined', false]);
-    }
-    //Set visible layout to game wiating to be in session
-    else if (!inSession && newGame) {
-        visibility('.menu-button,.room-id,.player-status');
-        $('.player-status').html('Waiting for player' + "<br/>" + ". . .");
-    }
     //End game if result has occured
     if (gameResult != undefined) {
         end(gameResult, variables.gameData.players)
     }
     //Set client and player turn status
-    if (inSession && gameResult == undefined) {
+    if (inSession == true && gameResult == undefined) {
         $('.player-status').css('visibility', 'visible')
         if (variables.gameData.players.includes(socket.id)) {
             $('.player-status').html((Object.values(variables.gameData.player_turn)[0] == socket.id) ? "Your Turn" :
@@ -390,10 +414,28 @@ socket.on('gameplay', ([data, gameRoomId]) => {
     updateBoard(variables.gameData)
 });
 
-socket.on('join-room', () => {
-    updateVariables(['joined', true])
-        // If client is player x then emit data to spectator
-    if (variables.gameData.players[0] === socket.id) {
-        socket.emit('gameplay', [variables.gameData, variables.roomId]);
+
+socket.on('player-joined', (userId) => {
+    console.log(userId + ' joined')
+    if (variables.joined || variables.gameData.players.length == 1) {
+        // If no current opponent exists
+        if (variables.gameData.players.length == 1) {
+            players = variables.gameData.players;
+            players.push(userId);
+            updateVariables([
+                ['gameData', {
+                    "players": players,
+                    "player_turn": { 'x': variables.gameData.players[0] },
+                    "board": { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0 },
+                    "spaces_left": 9,
+                    "in_session": true,
+                    "restriction": variables.gameData.restriction,
+                }],
+                ['roomId', variables.roomId]
+            ]);
+        }
+        updateVariables(['joined', false]);
+        visibility('.menu-button,.room-id,.player-status');
+        socket.emit('data-update', [variables.gameData, variables.roomId]);
     }
 });

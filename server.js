@@ -72,7 +72,6 @@ io.on('connection', (socket) => {
         }
         // (Checked all rooms or no rooms available) and not on initation
         if (availableRoom != null && roomCount === numOfGameRooms || numOfGameRooms === 0) {
-            console.log(roomCount, numOfGameRooms)
             if (availableRooms.length > 0) {
                 room = availableRooms[Math.floor(Math.random() * availableRooms.length)]
                 io.sockets.to(userId).emit('room-available', room, isRandomMatch);
@@ -81,11 +80,9 @@ io.on('connection', (socket) => {
                 io.sockets.to(userId).emit('room-available', null, isRandomMatch);
             }
         }
-
-        console.log(roomCount, availableRooms, Object.keys(io.sockets.adapter.rooms), numOfGameRooms)
     });
-    socket.on('gameplay', ([data, roomId]) => {
-        io.sockets.to(roomId).emit('gameplay', [data, roomId]);
+    socket.on('data-update', ([data, roomId]) => {
+        io.sockets.to(roomId).emit('data-update', [data, roomId]);
     });
     socket.on('new-game', (roomId, userId) => {
         io.sockets.to(roomId).emit('new-game', roomId, userId);
@@ -102,7 +99,7 @@ io.on('connection', (socket) => {
         };
         socket.join(roomId);
         currentRoomId = roomId;
-        io.sockets.to(roomId).emit('gameplay', [gameData, roomId]);
+        io.sockets.to(roomId).emit('data-update', [gameData, roomId]);
         console.log(`host: ${socket.id} has started a gameroom: ${roomId}`);
     });
     socket.on('opponent-connect', ([opponentId, roomId]) => {
@@ -115,15 +112,15 @@ io.on('connection', (socket) => {
             console.log(`${roomId} does not exist`);
         }
     });
-    socket.on('join-room', (roomId) => {
+    socket.on('join-room', (roomId, userId) => {
         // Check to see if room exists
         if (roomId in rooms) {
             // Check if room is game room
             if (roomId.length == 5) {
                 socket.join(roomId);
                 currentRoomId = roomId;
-                io.sockets.to(roomId).emit('join-room');
-                console.log(`player: ${socket.id} has joined gameroom: ${roomId}`);
+                io.sockets.to(roomId).emit('player-joined', userId);
+                console.log(`player: ${userId} has joined gameroom: ${roomId}`);
             }
         } else {
             console.log(`${roomId} does not exist`);
