@@ -351,6 +351,10 @@
     color: rgba(0, 0, 0, 1);
 }
 
+#input-room-id {
+    border: 1px;
+}
+
 
 /* 
 ////////
