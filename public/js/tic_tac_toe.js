@@ -77,8 +77,7 @@ function visibility(visible, action_type) {
 
 function animate_board() {
     var inPlay = $('.join-room').css('visibility') == 'hidden' &&
-        $('.restriction').css('visibility') == 'hidden' &&
-        $('.new-game').css('visibility') == 'hidden'
+        $('.restriction').css('visibility') == 'hidden'
     var sideMenuVisible = $('.side-menu').css('visibility') !== 'hidden'
 
     function moveBoardYAxis(yAxisPercentage) {
@@ -113,27 +112,6 @@ function host(restriction) {
     // variables.joined = true;
     socket.emit('host', [restriction, new_room_id]);
 }
-
-socket.on('disconnected', (userId) => {
-    wasDisconnectUserPlayer = (userId === variables.gameData.players[0] || userId === variables.gameData.players[1]);
-    // If player disconencted end
-    if (wasDisconnectUserPlayer) {
-        playerRemaining = variables.gameData.players.filter(item => item !== userId)[0];
-        updateVariables([
-            'gameData', {
-                "players": [playerRemaining],
-                "player_turn": { 'x': playerRemaining },
-                "board": variables.gameData.board,
-                "spaces_left": variables.gameData.spaces_left,
-                "in_session": variables.gameData.in_session,
-                "restriction": variables.gameData.restriction,
-            }
-        ]);
-        end(null, [playerRemaining]);
-        $('.player-status').html('Opponent disconnected');
-        socket.emit('data-update', [variables.gameData, variables.roomId]);
-    }
-});
 
 function end(result, players) {
 
@@ -403,5 +381,26 @@ socket.on('player-joined', (userId) => {
     if (variables.joined) {
         updateVariables(['joined', false]);
         visibility('.menu-button,.room-id,.player-status');
+    }
+});
+
+socket.on('disconnected', (userId) => {
+    wasDisconnectUserPlayer = (userId === variables.gameData.players[0] || userId === variables.gameData.players[1]);
+    // If player disconencted end
+    if (wasDisconnectUserPlayer) {
+        playerRemaining = variables.gameData.players.filter(item => item !== userId)[0];
+        updateVariables([
+            'gameData', {
+                "players": [playerRemaining],
+                "player_turn": { 'x': playerRemaining },
+                "board": variables.gameData.board,
+                "spaces_left": variables.gameData.spaces_left,
+                "in_session": variables.gameData.in_session,
+                "restriction": variables.gameData.restriction,
+            }
+        ]);
+        socket.emit('data-update', [variables.gameData, variables.roomId]);
+        end(null, [playerRemaining]);
+        $('.player-status').html('Opponent disconnected');
     }
 });

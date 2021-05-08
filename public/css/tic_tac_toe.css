@@ -370,6 +370,7 @@
 */
 
 .new-game.container {
+    z-index: 1;
     height: 12.5%;
     width: auto;
     left: 50%;
@@ -382,12 +383,14 @@
 }
 
 .binary-choice.container {
+    z-index: 1;
     gap: .4em;
     grid-template-columns: auto auto;
     display: grid;
 }
 
 .binary-choice.choice {
+    z-index: 1;
     font-weight: lighter;
     width: 3em;
     height: 2em;
@@ -406,6 +409,7 @@
 }
 
 .new-game.title {
+    z-index: 1;
     width: auto;
     height: 1.2em;
     left: 50%;
