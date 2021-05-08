@@ -102,16 +102,6 @@ io.on('connection', (socket) => {
         io.sockets.to(roomId).emit('data-update', [gameData, roomId]);
         console.log(`host: ${socket.id} has started a gameroom: ${roomId}`);
     });
-    socket.on('opponent-connect', ([opponentId, roomId]) => {
-        // Check if players full
-        if (roomId in rooms) {
-            if (rooms[roomId].length < 3) {
-                io.sockets.to(roomId).emit('opponent-connect', opponentId);
-            }
-        } else {
-            console.log(`${roomId} does not exist`);
-        }
-    });
     socket.on('join-room', (roomId, userId) => {
         // Check to see if room exists
         if (roomId in rooms) {

@@ -137,14 +137,14 @@ socket.on('disconnected', (userId) => {
 });
 
 function end(result, players) {
-    var isPlayer = players.includes(socket.id);
 
     // Refresh website
     if (result === undefined && players === undefined) {
         window.location = window.parent.location.origin
+        return
     }
-    console.log(players)
-        // Game was unfished
+    var isPlayer = players.includes(socket.id);
+    // Game was unfished
     if (players.length == 1) {
         if (isPlayer) {
             visibility('.new-game,.player-status,.room-id,.menu-button');
@@ -396,19 +396,21 @@ socket.on('data-update', ([data, roomId]) => {
     // }
     var gameResult = resultCheck(variables.gameData.board, variables.gameData.spaces_left);
     var inSession = variables.gameData.in_session;
-
     //End game if result has occured
     if (gameResult != undefined) {
         end(gameResult, variables.gameData.players)
     }
     //Set client and player turn status
     if (inSession == true && gameResult == undefined) {
-        $('.player-status').css('visibility', 'visible')
+        $('.player-status').css('visibility', 'visible');
+        // is player
         if (variables.gameData.players.includes(socket.id)) {
             $('.player-status').html((Object.values(variables.gameData.player_turn)[0] == socket.id) ? "Your Turn" :
                 `${Object.keys(variables.gameData.player_turn)[0].toUpperCase()}'s Turn`)
-        } else {
-            $('.player-status').html('Spectating' + "<br/>" + "<br/>" + `${Object.keys(variables.gameData.player_turn)[0].toUpperCase()}'s Turn`);
+        }
+        // is spectator
+        else {
+            $('.player-status').html('Spectating' + "<br/>" + `${Object.keys(variables.gameData.player_turn)[0].toUpperCase()}'s Turn`);
         }
     }
     updateBoard(variables.gameData)
@@ -416,9 +418,9 @@ socket.on('data-update', ([data, roomId]) => {
 
 
 socket.on('player-joined', (userId) => {
-    console.log(userId + ' joined')
-    if (variables.joined || variables.gameData.players.length == 1) {
-        // If no current opponent exists
+    isHost = variables.gameData.players[0] == socket.id
+    if (isHost) {
+        // No current opponent exits, then begin game
         if (variables.gameData.players.length == 1) {
             players = variables.gameData.players;
             players.push(userId);
@@ -434,8 +436,10 @@ socket.on('player-joined', (userId) => {
                 ['roomId', variables.roomId]
             ]);
         }
+        socket.emit('data-update', [variables.gameData, variables.roomId]);
+    }
+    if (variables.joined) {
         updateVariables(['joined', false]);
         visibility('.menu-button,.room-id,.player-status');
-        socket.emit('data-update', [variables.gameData, variables.roomId]);
     }
 });
