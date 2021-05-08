@@ -302,7 +302,7 @@ socket.on('disconnected', (roomId, userId) => {
     }
 });
 
-socket.on('search-rooms', (searchRoomId, userId, isRandomMatch, iter, numOfGameRooms) => {
+socket.on('search-rooms-restriction', (searchRoomId, userId, isRandomMatch, iter, numOfGameRooms) => {
     roomAvailable =
         ((isRandomMatch && variables.gameData.restriction === 'public' && variables.gameData.players.length === 1) || !isRandomMatch) ? searchRoomId :
         'checked';

@@ -60,7 +60,7 @@ io.on('connection', (socket) => {
                 if (searchRoomId.length == 5) {
                     roomCount++
                     // Check if room is a game room
-                    io.sockets.to(searchRoomId).emit('search-rooms', searchRoomId, userId, isRandomMatch, roomCount, numOfGameRooms, availableRooms);
+                    io.sockets.to(searchRoomId).emit('search-rooms-restriction', searchRoomId, userId, isRandomMatch, roomCount, numOfGameRooms);
                 }
             }
         }
