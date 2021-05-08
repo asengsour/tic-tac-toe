@@ -312,7 +312,7 @@
 }
 
 .restriction.choice {
-    font-weight: 350;
+    font-weight: lighter;
     font-family: Helvetica Neue;
     color: white;
     background-color: black;
@@ -385,7 +385,7 @@
 }
 
 .binary-choice.choice {
-    font-weight: 350;
+    font-weight: lighter;
     width: 3em;
     height: 2em;
     position: relative;
@@ -410,7 +410,7 @@
     transform: translate(-50%, -50%);
     position: relative;
     font-family: Helvetica Neue;
-    font-weight: 350;
+    font-weight: lighter;
     color: block;
     line-height: 1.5;
     display: flex;
