@@ -45,11 +45,11 @@
     .new-game.title {
         font-size: 24px;
     }
-    .new-game.container {
+    /* .new-game.container {
         height: 12.5%;
         left: 50%;
         top: calc(25% + 12.5%/2);
-    }
+    } */
     .join-room.container {
         width: 50%;
         top: 12.5%;
@@ -140,11 +140,11 @@
     .new-game.title {
         font-size: 32px;
     }
-    .new-game.container {
+    /* .new-game.container {
         height: 12.5%;
         left: 50%;
         top: calc(25%);
-    }
+    } */
     .join-room.container {
         max-width: 256px;
         max-height: 256px;
@@ -371,6 +371,8 @@
 
 .new-game.container {
     width: auto;
+    left: 50%;
+    top: 50%;
     transform: translate(-50%, -50%);
     visibility: hidden;
     position: absolute;
