@@ -165,7 +165,7 @@ function end(result, players) {
         }
         // Spectator 
         else if (!isPlayer) {
-            visibility('result,.room-id,.menu-button');
+            visibility('.result,.room-id,.menu-button');
             if (result !== 'null') {
                 $('.result').text(`${result.toUpperCase()} WON`);
             }
