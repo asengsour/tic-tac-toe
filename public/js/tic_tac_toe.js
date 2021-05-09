@@ -1,5 +1,5 @@
-// var socket = io.connect('https://tic-tac-toe-2021.herokuapp.com/');
-var socket = io.connect('http://127.0.0.1:80/');
+var socket = io.connect('https://tic-tac-toe-2021.herokuapp.com/');
+// var socket = io.connect('http://127.0.0.1:80/');
 
 var variables = {
     'roomId': null,
@@ -277,7 +277,6 @@ socket.on('search-rooms-restriction', (searchRoom, userId, isRandomMatch, iter, 
     roomAvailable =
         ((isRandomMatch && variables.gameData.restriction === 'public' && variables.gameData.players.length === 1) || !isRandomMatch) ? searchRoom :
         'checked';
-    console.log(numOfGameRooms)
     socket.emit('search-rooms', roomAvailable, userId, isRandomMatch, iter, numOfGameRooms)
 });
 
@@ -339,7 +338,6 @@ socket.on('data-update', ([data, roomId]) => {
         ['gameData', data],
         ['roomId', roomId]
     ]);
-    console.log(data)
     var gameResult = resultCheck(variables.gameData.board, variables.gameData.spaces_left);
     var inSession = variables.gameData.in_session;
     //End game if result has occured
