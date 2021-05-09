@@ -399,8 +399,8 @@ socket.on('disconnected', (userId) => {
                 "restriction": variables.gameData.restriction,
             }
         ]);
-        socket.emit('data-update', [variables.gameData, variables.roomId]);
         end(null, [playerRemaining]);
+        socket.emit('data-update', [variables.gameData, variables.roomId]);
         $('.player-status').html('Opponent disconnected');
     }
 });
