@@ -44,41 +44,39 @@ app.get('', (req, res) => {
 io.on('connection', (socket) => {
     var rooms = io.sockets.adapter.rooms;
     var currentRoomId;
-    var availableRooms = []
+    var availableRooms = [];
 
     socket.on('search-rooms', (availableRoom, userId, isRandomMatch, roomCount, numOfGameRooms) => {
         // Random match search initated
         if (availableRoom == null) {
-            // Go through each room in server
-            numOfGameRooms = 0
+            availableRooms = [];
+            var newRooms = [];
+            // Go through each room in server to find new game rooms
             for (var room in rooms) {
-                if (room.length == 5) {
-                    numOfGameRooms++
+                if (room.length == 5 && io.sockets.adapter.rooms[room].length == 1) {
+                    newRooms.push(room);
                 }
             }
-            for (var searchRoomId in rooms) {
-                if (searchRoomId.length == 5) {
-                    roomCount++
-                    // Check if room is a game room
-                    io.sockets.to(searchRoomId).emit('search-rooms-restriction', searchRoomId, userId, isRandomMatch, roomCount, numOfGameRooms);
-                }
+            for (var searchRoom of newRooms) {
+                roomCount++
+                numOfGameRooms = newRooms.length;
+                // Check if room restriction is public
+                io.sockets.to(searchRoom).emit('search-rooms-restriction', searchRoom, userId, isRandomMatch, roomCount, numOfGameRooms);
+            }
+            // No new rooms found, creating new room
+            if (newRooms.length == 0) {
+                io.sockets.to(userId).emit('room-available', null, isRandomMatch);
             }
         }
         // Found public room, adding to array
         if (availableRoom != null && availableRoom != 'checked') {
-            if (availableRoom.length == 5) {
-                availableRooms.push(availableRoom)
-            }
+            availableRooms.push(availableRoom)
         }
-        // (Checked all rooms or no rooms available) and not on initation
-        if (availableRoom != null && roomCount === numOfGameRooms || numOfGameRooms === 0) {
-            if (availableRooms.length > 0) {
-                room = availableRooms[Math.floor(Math.random() * availableRooms.length)]
-                io.sockets.to(userId).emit('room-available', room, isRandomMatch);
-                currentRoomId = room;
-            } else {
-                io.sockets.to(userId).emit('room-available', null, isRandomMatch);
-            }
+        // Checked all found rooms and not on initation
+        if (availableRoom != null && roomCount == numOfGameRooms) {
+            room = availableRooms[Math.floor(Math.random() * availableRooms.length)]
+            io.sockets.to(userId).emit('room-available', room, isRandomMatch);
+            currentRoomId = room;
         }
     });
     socket.on('data-update', ([data, roomId]) => {

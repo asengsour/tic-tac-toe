@@ -1,5 +1,5 @@
-var socket = io.connect('https://tic-tac-toe-2021.herokuapp.com/');
-// var socket = io.connect('http://127.0.0.1:80/');
+// var socket = io.connect('https://tic-tac-toe-2021.herokuapp.com/');
+var socket = io.connect('http://127.0.0.1:80/');
 
 var variables = {
     'roomId': null,
@@ -227,7 +227,7 @@ window.addEventListener('resize', () => {
 window.addEventListener('keyup', (event) => {
     if (event.key == 13 || event.key == 'Enter') {
         if (event.target.matches('#input-room-id')) {
-            socket.emit('search-rooms', event.target.value, socket.id, false);
+            socket.emit('search-rooms', event.target.value, socket.id, false, 0, 0);
         }
     }
 });
@@ -247,7 +247,7 @@ window.addEventListener('click', (event) => {
         visibility('.join-room,.menu-button');
     }
     if (event.target.matches('.random-match')) {
-        socket.emit('search-rooms', null, socket.id, true, 0);
+        socket.emit('search-rooms', null, socket.id, true, 0, 0);
     }
     if (event.target.matches('.leave')) {
         end();
@@ -273,10 +273,11 @@ window.addEventListener('click', (event) => {
     }
 });
 
-socket.on('search-rooms-restriction', (searchRoomId, userId, isRandomMatch, iter, numOfGameRooms) => {
+socket.on('search-rooms-restriction', (searchRoom, userId, isRandomMatch, iter, numOfGameRooms) => {
     roomAvailable =
-        ((isRandomMatch && variables.gameData.restriction === 'public' && variables.gameData.players.length === 1) || !isRandomMatch) ? searchRoomId :
+        ((isRandomMatch && variables.gameData.restriction === 'public' && variables.gameData.players.length === 1) || !isRandomMatch) ? searchRoom :
         'checked';
+    console.log(numOfGameRooms)
     socket.emit('search-rooms', roomAvailable, userId, isRandomMatch, iter, numOfGameRooms)
 });
 
@@ -313,12 +314,16 @@ socket.on('new-game', (roomId, userId) => {
         );
     };
     // Update layout for first player to chose to start new game
+    // Player who decided to start a new game
     if (userId == socket.id && variables.gameData.in_session == 'pending') {
         updateBoard(variables.gameData);
         visibility('.menu-button,.room-id,.player-status');
+        // Waiting for opponent to choose
         if (variables.gameData.players.length == 2) {
             $('.player-status').html('Waiting for Player to Choose');
-        } else {
+        }
+        // Chose new game, but no opponenet exists
+        else {
             $('.player-status').html('Waiting for Player to Join');
         }
     }
@@ -334,11 +339,19 @@ socket.on('data-update', ([data, roomId]) => {
         ['gameData', data],
         ['roomId', roomId]
     ]);
+    console.log(data)
     var gameResult = resultCheck(variables.gameData.board, variables.gameData.spaces_left);
     var inSession = variables.gameData.in_session;
     //End game if result has occured
     if (gameResult != undefined) {
         end(gameResult, variables.gameData.players)
+    }
+    if (variables.gameData.in_session == 'pending') {
+        if ($('.new-game').css('visibility') == 'visible') {
+            $('.player-status').html('Player has join' + "<br/>" + 'Waiting for on you to choose');
+        } else {
+            $('.player-status').html('Waiting for Host to Start');
+        }
     }
     //Set client and player turn status
     if (inSession == true && gameResult == undefined) {
@@ -361,16 +374,17 @@ socket.on('player-joined', (userId) => {
     isHost = variables.gameData.players[0] == socket.id
     if (isHost) {
         // No current opponent exits, then begin game
-        if (variables.gameData.players.length == 1) {
-            players = variables.gameData.players;
+        players = variables.gameData.players;
+        if (players.length == 1) {
             players.push(userId);
+            // If game ended and new player has joined
             updateVariables([
                 ['gameData', {
                     "players": players,
-                    "player_turn": { 'x': variables.gameData.players[0] },
+                    "player_turn": { 'x': players[0] },
                     "board": { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0 },
                     "spaces_left": 9,
-                    "in_session": true,
+                    "in_session": ($('.new-game').css('visibility') == 'visible') ? 'pending' : true,
                     "restriction": variables.gameData.restriction,
                 }],
                 ['roomId', variables.roomId]
@@ -389,6 +403,7 @@ socket.on('disconnected', (userId) => {
     // If player disconencted end
     if (wasDisconnectUserPlayer) {
         playerRemaining = variables.gameData.players.filter(item => item !== userId)[0];
+        console.log(playerRemaining)
         updateVariables([
             'gameData', {
                 "players": [playerRemaining],
@@ -402,5 +417,6 @@ socket.on('disconnected', (userId) => {
         end(null, [playerRemaining]);
         socket.emit('data-update', [variables.gameData, variables.roomId]);
         $('.player-status').html('Opponent disconnected');
+        console.log(variables.gameData)
     }
 });
