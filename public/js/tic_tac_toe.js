@@ -1,4 +1,4 @@
-var socket = io.connect('https://tic-tac-toe-2021.herokuapp.com/');
+var socket = io.connect('http://tic-tac-toe.io/');
 // var socket = io.connect('http://127.0.0.1:80/');
 
 var variables = {
@@ -49,7 +49,7 @@ function visibility(visible, action_type) {
         $(`${visible}`).toggle();
         $(`${visible}`).css('visibility', $(`${visible}`).css('visibility') == 'hidden' ? 'visible' : 'hidden');
     }
-    // Update _elements to hide if window size decreased
+    // Update elements to hide if window size decreased
     else if (action_type == 'decreased') {
         $('.active').each(function() {
             if ($(this).css('visibility') === 'visible' && $(`${visible}`).css('visibility') === 'visible') {
@@ -58,7 +58,7 @@ function visibility(visible, action_type) {
         });
         return
     }
-    // Update _elements to show if window size increased
+    // Update elements to show if window size increased
     else if (action_type == 'increased') {
         $('.active').each(function() {
             if ($(this).css('display') != 'none' && $(`.start-menu`).css('visibility') != 'visible') {
@@ -66,7 +66,9 @@ function visibility(visible, action_type) {
             }
         });
         return
-    } else {
+    }
+    // Hide all elements in elements array, then show desired elements 
+    else {
         $(`${elements}`).css('display', 'none');
         $(`${elements}`).css('visibility', 'hidden');
         $(`${visible}`).css('display', '');
