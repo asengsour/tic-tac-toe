@@ -1,4 +1,4 @@
-var socket = io.connect('http://tic-tac-toe.io/');
+var socket = io.connect('https://tic-tac-toe-2021.herokuapp.com/');
 // var socket = io.connect('http://127.0.0.1:80/');
 
 var variables = {
