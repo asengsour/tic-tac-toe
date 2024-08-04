@@ -28,12 +28,6 @@ app.use(express.static('public'))
 app.use('/css', express.static(join(__dirname, 'public')))
 app.use('/js', express.static(join(__dirname, 'public')))
 
-// Set Views
-// app.set('views')
-
-// Set Data
-// app.set('data', [])
-
 app.get('', (req, res) => {
     res.sendFile(__dirname + '/public/index.html')
 })
@@ -45,7 +39,7 @@ io.on('connection', (socket) => {
     var rooms = Array.from(io.sockets.adapter.rooms.keys());
     var currentRoomId;
     var availableRooms = [];
-    console.info(rooms)
+    
     socket.on('search-rooms', (availableRoom, userId, isRandomMatch, roomCount, numOfGameRooms) => {
         // Random match search initated
         if (availableRoom == null) {
@@ -67,12 +61,10 @@ io.on('connection', (socket) => {
             if (newRooms.length == 0) {
                 io.sockets.to(userId).emit('room-available', null, isRandomMatch);
             }
-            console.info("Random Match",[availableRoom, userId, isRandomMatch, roomCount, numOfGameRooms]);
         }
         // Found public room, adding to array
         if (availableRoom != null && availableRoom != 'checked') {
             availableRooms.push(availableRoom)
-            console.info("Public",[availableRoom, userId, isRandomMatch, roomCount, numOfGameRooms]);
         }
         // Checked all found rooms and not on initation
         if (availableRoom != null && roomCount == numOfGameRooms) {
@@ -101,8 +93,6 @@ io.on('connection', (socket) => {
         currentRoomId = roomId;
         io.sockets.to(roomId).emit('data-update', [gameData, roomId]);
         console.log(`host: ${socket.id} has started a gameroom: ${roomId}`);
-        // console.info([currentRoomId,availableRooms,rooms])
-        // console.info(jsonRooms)
     });
     socket.on('join-room', (roomId, userId) => {
         // Check to see if room exists
@@ -121,5 +111,5 @@ io.on('connection', (socket) => {
     });
 });
 
-// Listen on port 80
+// Listen on localhost:80
 server.listen(port, () => console.info(`Listening on port ${port}`))
