@@ -1,16 +1,17 @@
 // imports
-require('dotenv').config()
-const path = require('path');
-const http = require('http');
+// require('dotenv').config()
 const express = require('express');
-const socketio = require('socket.io');
+const { createServer } = require('node:http');
+const { join } = require('node:path');
+const { Server } = require('socket.io');
 const app = express();
-const server = http.createServer(app);
-const io = socketio(server);
+const server = createServer(app);
+const io = new Server(server);
 const port = process.env.PORT || 80;
 
+
 // MongoDB Atlas
-// var MongoClient = require('mongodb').MongoClient;
+/* // var MongoClient = require('mongodb').MongoClient;
 // MongoClient.connect(process.env.uri, function(err, db) {
 
 //     var cursor = db.collection('player').find();
@@ -20,19 +21,18 @@ const port = process.env.PORT || 80;
 //         console.log(doc);
 
 //     });
-// });
+// }); */
 
 // Static Files
 app.use(express.static('public'))
-app.use('/css', express.static(__dirname + 'public/css'))
-app.use('/js', express.static(__dirname + 'public/js'))
+app.use('/css', express.static(join(__dirname, 'public')))
+app.use('/js', express.static(join(__dirname, 'public')))
 
 // Set Views
-app.set('views', './views')
-app.set('view engine', 'js')
+// app.set('views')
 
 // Set Data
-app.set('data', './data')
+// app.set('data', [])
 
 app.get('', (req, res) => {
     res.sendFile(__dirname + '/public/index.html')
@@ -42,10 +42,10 @@ app.get('', (req, res) => {
 
 // server-side
 io.on('connection', (socket) => {
-    var rooms = io.sockets.adapter.rooms;
+    var rooms = Array.from(io.sockets.adapter.rooms.keys());
     var currentRoomId;
     var availableRooms = [];
-
+    console.info(rooms)
     socket.on('search-rooms', (availableRoom, userId, isRandomMatch, roomCount, numOfGameRooms) => {
         // Random match search initated
         if (availableRoom == null) {
@@ -53,7 +53,7 @@ io.on('connection', (socket) => {
             var newRooms = [];
             // Go through each room in server to find new game rooms
             for (var room in rooms) {
-                if (room.length == 5 && io.sockets.adapter.rooms[room].length == 1) {
+                if (room[0].length == 5 && io.sockets.adapter.rooms[room].length == 1) {
                     newRooms.push(room);
                 }
             }
@@ -67,10 +67,12 @@ io.on('connection', (socket) => {
             if (newRooms.length == 0) {
                 io.sockets.to(userId).emit('room-available', null, isRandomMatch);
             }
+            console.info("Random Match",[availableRoom, userId, isRandomMatch, roomCount, numOfGameRooms]);
         }
         // Found public room, adding to array
         if (availableRoom != null && availableRoom != 'checked') {
             availableRooms.push(availableRoom)
+            console.info("Public",[availableRoom, userId, isRandomMatch, roomCount, numOfGameRooms]);
         }
         // Checked all found rooms and not on initation
         if (availableRoom != null && roomCount == numOfGameRooms) {
@@ -99,17 +101,17 @@ io.on('connection', (socket) => {
         currentRoomId = roomId;
         io.sockets.to(roomId).emit('data-update', [gameData, roomId]);
         console.log(`host: ${socket.id} has started a gameroom: ${roomId}`);
+        // console.info([currentRoomId,availableRooms,rooms])
+        // console.info(jsonRooms)
     });
     socket.on('join-room', (roomId, userId) => {
         // Check to see if room exists
-        if (roomId in rooms) {
-            // Check if room is game room
-            if (roomId.length == 5) {
-                socket.join(roomId);
-                currentRoomId = roomId;
-                io.sockets.to(roomId).emit('player-joined', userId);
-                console.log(`player: ${userId} has joined gameroom: ${roomId}`);
-            }
+        console.info("join room",roomId,rooms,availableRooms)
+        if (availableRooms.includes(roomId)) {
+            socket.join(roomId);
+            currentRoomId = roomId;
+            io.sockets.to(roomId).emit('player-joined', userId);
+            console.log(`player: ${userId} has joined gameroom: ${roomId}`);
         } else {
             console.log(`${roomId} does not exist`);
         }
